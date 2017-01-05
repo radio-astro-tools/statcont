@@ -594,9 +594,9 @@ def process_files(tmp_files=None, ispec=False, iname=False, ifile=False,
                         if csigmaclip:
                             ax2.axhline(y=sigmaclip_flux, linestyle='-', color='red', linewidth='1.5')
                             if iname or ifile:
-                                ax1.text(0.4, 0.0, "corrSigma-clip = " + str(int(sigmaclip_flux*1.e5)/1.e5) + " " + bunit + " (+/- " + str(int(sigmaclip_sigma*1.e5)/1.e5) + ")")
+                                ax1.text(0.4, 0.0, "corrSigma-clip = " + str(int(sigmaclip_flux*1.e5)/1.e5) + " " + bunit + " (+/- " + str(int(sigmaclip_noise*1.e5)/1.e5) + ")")
                             if ispec:
-                                ax1.text(0.4, 0.0, "corrSigma-clip = " + str(int(sigmaclip_flux*1.e5)/1.e5) + " (+/- " + str(int(sigmaclip_sigma*1.e5)/1.e5) + ")")
+                                ax1.text(0.4, 0.0, "corrSigma-clip = " + str(int(sigmaclip_flux*1.e5)/1.e5) + " (+/- " + str(int(sigmaclip_noise*1.e5)/1.e5) + ")")
                         plt.xlabel('Frequency (GHz)')
                         plt.ylabel('Intensity')
 

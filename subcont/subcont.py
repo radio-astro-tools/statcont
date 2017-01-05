@@ -517,28 +517,9 @@ def process_files(tmp_files=None, ispec=False, iname=False, ifile=False,
 
                     # CONTINUUM FLUX from the method of sigma-clipping
                     if csigmaclip:
-                        # sigma-clipping method applied to the flux array
-                        if astropy.__version__[0] == '1':
-                            filtered_data = sigma_clip(flux, sigma=1.8, iters=None)
-                        if astropy.__version__[0] == '0':
-                            filtered_data = sigma_clip(flux, 1.8, iters=None)
 
-                        #
-                        # for deep absorptions/emission like SgrB2
-                        sigmaclip_flux = np.mean(filtered_data)
-                        sigmaclip_sigma = np.std(filtered_data)
-                        sigmaclip_flux_prev = np.mean(filtered_data)
-                        mean_flux = np.mean(flux)
-                        sigmaclip_flux = sigmaclip_flux_prev
-                        # for EMISSION-dominated spectra
-                        if (mean_flux-sigmaclip_flux_prev) > (+1.0*rms_noise):
-                            sigmaclip_flux = sigmaclip_flux_prev - sigmaclip_sigma
-                        # for ABSORPTION-dominated spectra
-                        if (mean_flux-sigmaclip_flux_prev) < (-1.0*rms_noise):
-                            sigmaclip_flux = sigmaclip_flux_prev + sigmaclip_sigma
-                        sigmaclip_noise = sigmaclip_sigma
+                        sigmaclip_flux, sigmaclip_noise = c_sigma_clip(flux, rms_noise)
 
-                        #
                         # determination of the continuum level (mean)
                         # and noise/uncertainty (dispersion/standard deviation)
 
@@ -547,7 +528,7 @@ def process_files(tmp_files=None, ispec=False, iname=False, ifile=False,
 
                         if verbose:
                             print("    flux of sigma-clip   = " + str(int(sigmaclip_flux*1.e5)/1.e5))
-                            print("    error sigma-clip     = " + str(int(sigmaclip_sigma*1.e5)/1.e5))
+                            print("    error sigma-clip     = " + str(int(sigmaclip_noise*1.e5)/1.e5))
 
                     #
                     # creating some plots with spectra and continuum levels
@@ -1034,3 +1015,25 @@ def process_files(tmp_files=None, ispec=False, iname=False, ifile=False,
         print("... FILEs CREATED are found in " + cont_path)
         print("  . search for spindex, cont_model and line_cont_model")
         print(" ")
+
+def c_sigma_clip(flux, rms_noise):
+
+    # sigma-clipping method applied to the flux array
+    if astropy.version.major >= 1:
+        filtered_data = sigma_clip(flux, sigma=1.8, iters=None)
+    elif astropy.version.major < 1:
+        filtered_data = sigma_clip(flux, sig=1.8, iters=None)
+
+    # for deep absorptions/emission like SgrB2
+    sigmaclip_flux_prev = sigmaclip_flux = np.mean(filtered_data)
+    sigmaclip_noise = sigmaclip_sigma = np.std(filtered_data)
+    mean_flux = np.mean(flux)
+
+    # for EMISSION-dominated spectra
+    if (mean_flux-sigmaclip_flux_prev) > (+1.0*rms_noise):
+        sigmaclip_flux = sigmaclip_flux_prev - sigmaclip_sigma
+    # for ABSORPTION-dominated spectra
+    elif (mean_flux-sigmaclip_flux_prev) < (-1.0*rms_noise):
+        sigmaclip_flux = sigmaclip_flux_prev + sigmaclip_sigma
+
+    return sigmaclip_flux, sigmaclip_noise

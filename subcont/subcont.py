@@ -1016,13 +1016,35 @@ def process_files(tmp_files=None, ispec=False, iname=False, ifile=False,
         print("  . search for spindex, cont_model and line_cont_model")
         print(" ")
 
-def c_sigma_clip(flux, rms_noise):
+def c_sigma_clip(flux, rms_noise, sigma_clip_threshold=1.8):
+    """
+    Perform sigma-clipping to determine the mean flux level, with different
+    adaptations for emission- and absorption-dominated spectra
+
+    Parameters
+    ----------
+    flux : np.ndarray
+        One-dimension array of flux values
+    rms_noise : float
+        The estimated RMS noise level of the data
+    sigma_clip_threshold : float
+        The threshold in number of sigma above/below which to reject outlier
+        data
+
+    Returns
+    -------
+    sigmaclip_flux : float
+    sigmaclip_noise : float
+        The measured continuum flux and estimated 1-sigma per-channel noise
+        around that measurement
+    """
 
     # sigma-clipping method applied to the flux array
     if astropy.version.major >= 1:
-        filtered_data = sigma_clip(flux, sigma=1.8, iters=None)
+        filtered_data = sigma_clip(flux, sigma=sigma_clip_threshold,
+                                   iters=None)
     elif astropy.version.major < 1:
-        filtered_data = sigma_clip(flux, sig=1.8, iters=None)
+        filtered_data = sigma_clip(flux, sig=sigma_clip_threshold, iters=None)
 
     # for deep absorptions/emission like SgrB2
     sigmaclip_flux_prev = sigmaclip_flux = np.mean(filtered_data)

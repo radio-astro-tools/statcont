@@ -357,26 +357,12 @@ def process_files(ispec=False, iname=False, ifile=False, ipath=False,
                         nchan = len(flux)
                         flux = flux
 
-                    #
-                    # creating a general histogram of the flux data
-                    # main variables are:
-                    #   all_hist     - counts in each bin of the histogram
-                    #   all_bins     - location of the bins (fluxes)
-                    #   all_number_* - index of the array
                     if cmax or cmean or cmedian or cpercent or cGaussian:
-                        number_bins = int((np.amax(flux)-np.amin(flux))/(2*rms_noise))
-                        all_hist, all_bin_edges = np.histogram(flux, number_bins)
-                        all_bin_width = abs(all_bin_edges[1]-all_bin_edges[0])
-                        all_bins = all_bin_edges[0:len(all_bin_edges)-1]
-                        all_bins = [x + all_bin_width/2. for x in all_bins]
-                        all_number_max_array = (np.where(all_hist == all_hist.max())[0])
-                        all_number_max = all_number_max_array[0]
-                        # not used all_hist_max = all_hist[all_number_max]
-                        all_bins_max = (all_bin_edges[all_number_max] + all_bin_width/2.)
+                        all_bins, all_hist, sel_bins, sel_hist, sel_flux = cont_histo(flux, rms_noise)
 
                     # CONTINUUM FLUX as the maximum of the histogram
                     if cmax:
-                        maximum_flux = all_bins_max
+                        maximum_flux = c_max(flux, rms_noise)
 
                         continuum_flux_maximum[ypix].append(maximum_flux)
 
@@ -417,30 +403,6 @@ def process_files(ispec=False, iname=False, ifile=False, ipath=False,
                             print("    flux of percent 25   = " + str(int(percent25_flux*1.e5)/1.e5))
                             print("    flux of percent 75   = " + str(int(percent75_flux*1.e5)/1.e5))
 
-                    # Gaussian fit around the maximum of the distribution
-                    # determining the range to fit the Gaussian function
-                    if cmax or cmean or cmedian or cGaussian:
-                        all_number_left  = (np.where(((all_hist == 0) & (all_bins <= all_bins_max)) | (all_bins == all_bins[0]))[0]).max()
-                        all_number_right = (np.where(((all_hist == 0) & (all_bins >= all_bins_max)) | (all_bins == all_bins[number_bins-1]))[0]).min()
-                        all_number_total = abs(all_number_right-all_number_max)+abs(all_number_left-all_number_max)
-                        emission_absorption_ratio = abs(all_number_right-all_number_max)*1.0/(all_number_total*1.0)
-                        if (emission_absorption_ratio >= 0.66):
-                            lower_all_bins = all_bins_max - 8. * all_bin_width
-                            upper_all_bins = all_bins_max + 4. * all_bin_width
-                        if (emission_absorption_ratio <= 0.33):
-                            lower_all_bins = all_bins_max - 4. * all_bin_width
-                            upper_all_bins = all_bins_max + 8. * all_bin_width
-                        if ((emission_absorption_ratio > 0.33) and (emission_absorption_ratio < 0.66)):
-                            lower_all_bins = all_bins_max - 5. * all_bin_width
-                            upper_all_bins = all_bins_max + 5. * all_bin_width
-                        sel_bins_array = np.where((all_bins >= lower_all_bins) & (all_bins <= upper_all_bins))[0]
-                        if (len(sel_bins_array) < 3):
-                            sel_bins_array = [sel_bins_array[0]-2, sel_bins_array[0]-1, sel_bins_array[0], sel_bins_array[0]+1, sel_bins_array[0]+2]
-                            lower_all_bins = all_bins[sel_bins_array[0]]
-                            upper_all_bins = all_bins[sel_bins_array[len(sel_bins_array)-1]]
-                        sel_bins = all_bins[sel_bins_array[0]:sel_bins_array[len(sel_bins_array)-1]+1]
-                        sel_hist = all_hist[sel_bins_array[0]:sel_bins_array[len(sel_bins_array)-1]+1]
-                        sel_flux = flux[(flux >= lower_all_bins) & (flux <= upper_all_bins)]
 
                     # CONTINUUM FLUX as the mean of the "Gaussian" distribution
                     if cmean or cGaussian:
@@ -1011,6 +973,100 @@ def process_files(ispec=False, iname=False, ifile=False, ipath=False,
         print("... FILEs CREATED are found in " + cont_path)
         print("  . search for spindex, cont_model and line_cont_model")
         print(" ")
+
+def cont_histo(flux, rms_noise):
+    """
+    Create histogram distribution of the flux data
+    and select a narrower range around the maximum
+    of the histogram distribution
+    
+    Parameters
+    ----------
+    flux : np.ndarray
+        One-dimension array of flux values
+    rms_noise : float
+        The estimated RMS noise level of the data
+    
+    Returns
+    -------
+    all_bins : np.ndarray
+        One-dimension array with the value of bins of the histogram
+    all_hist : np.ndarray
+        One-dimension array with the value of the position of the bins
+    sel_bins : np.ndarray
+        One-dimension array with the value of bins of the histogram
+        for the selected bins around the maximum
+    sel_hist : np.ndarray
+        One-dimension array with the value of position of the bins
+        for the selected bins around the maximum
+    sel_flux : np.ndarray
+        One-dimension array of the flux values selected
+        around the maximum of the histogram
+    """
+    
+    #
+    # creating a general histogram of the flux data
+    # main variables are:
+    #   all_hist     - counts in each bin of the histogram
+    #   all_bins     - location of the bins (fluxes)
+    #   all_number_* - index of the array
+    number_bins = int((np.amax(flux)-np.amin(flux))/(2*rms_noise))
+    all_hist, all_bin_edges = np.histogram(flux, number_bins)
+    all_bins = all_bin_edges[0:len(all_bin_edges)-1]
+    all_bins = [x + (all_bins[1]-all_bins[0])/2. for x in all_bins]
+    all_number_max_array = (np.where(all_hist == all_hist.max())[0])
+    all_number_max = all_number_max_array[0]
+    all_bins_max = (all_bin_edges[all_number_max] + (all_bins[1]-all_bins[0])/2.)
+
+    # Gaussian fit around the maximum of the distribution
+    # determining the range to fit the Gaussian function
+    all_number_left  = (np.where(((all_hist == 0) & (all_bins <= all_bins_max)) | (all_bins == all_bins[0]))[0]).max()
+    all_number_right = (np.where(((all_hist == 0) & (all_bins >= all_bins_max)) | (all_bins == all_bins[number_bins-1]))[0]).min()
+    all_number_total = abs(all_number_right-all_number_max)+abs(all_number_left-all_number_max)
+    emission_absorption_ratio = abs(all_number_right-all_number_max)*1.0/(all_number_total*1.0)
+    if (emission_absorption_ratio >= 0.66):
+        lower_all_bins = all_bins_max - 8. * (all_bins[1]-all_bins[0])
+        upper_all_bins = all_bins_max + 4. * (all_bins[1]-all_bins[0])
+    if (emission_absorption_ratio <= 0.33):
+        lower_all_bins = all_bins_max - 4. * (all_bins[1]-all_bins[0])
+        upper_all_bins = all_bins_max + 8. * (all_bins[1]-all_bins[0])
+    if ((emission_absorption_ratio > 0.33) and (emission_absorption_ratio < 0.66)):
+        lower_all_bins = all_bins_max - 5. * (all_bins[1]-all_bins[0])
+        upper_all_bins = all_bins_max + 5. * (all_bins[1]-all_bins[0])
+    sel_bins_array = np.where((all_bins >= lower_all_bins) & (all_bins <= upper_all_bins))[0]
+    if (len(sel_bins_array) < 3):
+        sel_bins_array = [sel_bins_array[0]-2, sel_bins_array[0]-1, sel_bins_array[0], sel_bins_array[0]+1, sel_bins_array[0]+2]
+        lower_all_bins = all_bins[sel_bins_array[0]]
+        upper_all_bins = all_bins[sel_bins_array[len(sel_bins_array)-1]]
+    sel_bins = all_bins[sel_bins_array[0]:sel_bins_array[len(sel_bins_array)-1]+1]
+    sel_hist = all_hist[sel_bins_array[0]:sel_bins_array[len(sel_bins_array)-1]+1]
+    sel_flux = flux[(flux >= lower_all_bins) & (flux <= upper_all_bins)]
+    
+    return all_bins, all_hist, sel_bins, sel_hist, sel_flux
+
+
+def c_max(flux, rms_noise):
+    """
+    Perform histogram distribution of variable flux, and determine
+    the flux level of the maximum of the histogram
+    
+    Parameters
+    ----------
+    flux : np.ndarray
+        One-dimension array of flux values
+    rms_noise : float
+        The estimated RMS noise level of the data
+    
+    Returns
+    -------
+    maximum_flux : float
+        The measured continuum flux as the maximum of the histogram
+    """
+    all_bins, all_hist, sel_bins, sel_hist, sel_flux = cont_histo(flux, rms_noise)
+    
+    maximum_flux = all_bins[(np.where(all_hist == all_hist.max())[0])[0]]
+    
+    return maximum_flux
 
 def c_percent(flux, percentile):
     """

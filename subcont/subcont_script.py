@@ -81,8 +81,8 @@ def main(args=None):
     # Noise level of your data cubes (in units of the fits files)
     rms_noise = op.noise[0]
 
-    process_files(tmp_files=op.tmp_files, ispec=op.ispec, iname=op.iname,
-                  ifile=op.ifile, rms_noise=rms_noise, continuum=op.continuum, cmax=op.cmax,
+    process_files(ispec=op.ispec, iname=op.iname, ifile=op.ifile,
+                  ipath=op.ipath, rms_noise=rms_noise, continuum=op.continuum, cmax=op.cmax,
                   cmean=op.cmean, cmedian=op.cmedian, cpercent=op.cpercent,
                   cKDEmax=op.cKDEmax, cGaussian=op.cGaussian, cfree=op.cfree,
                   csigmaclip=op.csigmaclip, verbose=op.verbose, plots=op.plots,

@@ -58,12 +58,11 @@ def gaussian(x, a, mu, sigma):
 # Main code: Reading data and header, and determining the continuum level:
 #
 
-def process_files(tmp_files=None, ispec=False, iname=False, ifile=False,
+def process_files(ispec=False, iname=False, ifile=False, ipath=False,
                   rms_noise=None, continuum=False, cmax=False, cmean=False,
                   cmedian=False, cpercent=False, cKDEmax=False,
                   cGaussian=False, cfree=False, csigmaclip=False, cutout=False,
-                  spindex=False, verbose=False, plots=False, imerge=False,
-                  ipath=None):
+                  spindex=False, verbose=False, plots=False, imerge=False):
 
     ################################################################################
     #
@@ -408,17 +407,14 @@ def process_files(tmp_files=None, ispec=False, iname=False, ifile=False,
 
                     # CONTINUUM FLUX as the percentile(s) of the histogram
                     if cpercent:
-                        percent25_flux = np.percentile(flux, 25)
-                        percent50_flux = np.percentile(flux, 50)
-                        percent75_flux = np.percentile(flux, 75)
+                        percent25_flux = c_percent(flux, percentile=25)
+                        percent75_flux = c_percent(flux, percentile=75)
 
                         continuum_flux_percent25[ypix].append(percent25_flux)
-                        continuum_flux_percent50[ypix].append(percent50_flux)
                         continuum_flux_percent75[ypix].append(percent75_flux)
 
                         if verbose:
                             print("    flux of percent 25   = " + str(int(percent25_flux*1.e5)/1.e5))
-                            print("    flux of percent 50   = " + str(int(percent50_flux*1.e5)/1.e5))
                             print("    flux of percent 75   = " + str(int(percent75_flux*1.e5)/1.e5))
 
                     # Gaussian fit around the maximum of the distribution
@@ -1015,6 +1011,28 @@ def process_files(tmp_files=None, ispec=False, iname=False, ifile=False,
         print("... FILEs CREATED are found in " + cont_path)
         print("  . search for spindex, cont_model and line_cont_model")
         print(" ")
+
+def c_percent(flux, percentile):
+    """
+    Perform numpy percentile to determine the level of the selected
+    percentile
+    
+    Parameters
+    ----------
+    flux : np.ndarray
+        One-dimension array of flux values
+    percentile : float
+        The selected percentile
+    
+    Returns
+    -------
+    percent_flux : float
+        The measured continuum flux at the selected percentile
+    """
+    
+    percent_flux = np.percentile(flux, percentile)
+    
+    return percent_flux
 
 def c_sigma_clip(flux, rms_noise, sigma_clip_threshold=1.8):
     """

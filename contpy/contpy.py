@@ -40,20 +40,6 @@ from . import fits_cutout
 
 ################################################################################
 #
-# Variables and functions used throughout the code:
-#
-
-# Definition of the Gaussian function
-fitfunc = lambda p, x: p[0]*np.exp(-0.5*((x-p[1])/p[2])**2.)
-errfunc = lambda p, x, y: (y - fitfunc(p, x))
-
-# Definition of the Gaussian function (version 2 of the fit, currently not used)
-def gaussian(x, a, mu, sigma):
-    return a * np.exp(-(1./2.) * np.power((x - mu)/sigma, 2.))
-
-
-################################################################################
-#
 # Main code: Reading data and header, and determining the continuum level:
 #
 
@@ -911,6 +897,7 @@ def process_files(ispec=False, iname=False, ifile=False, ipath=False,
         print("  . search for spindex, cont_model and line_cont_model")
         print(" ")
 
+
 def cont_histo(flux, rms_noise):
     """
     Create histogram distribution of the flux data
@@ -1141,6 +1128,9 @@ def c_Gaussian(flux, rms_noise):
         center and width of the Gaussian fit to a selected range around
         the maximum of the distribution
     """
+
+    fitfunc = lambda p, x: p[0]*np.exp(-0.5*((x-p[1])/p[2])**2.)
+    errfunc = lambda p, x, y: (y - fitfunc(p, x))
     
     all_bins, all_hist, sel_bins, sel_hist, sel_flux = cont_histo(flux, rms_noise)
 

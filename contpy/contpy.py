@@ -1,29 +1,17 @@
-################################################################################
-#
-# CONTPY: A statistical continuum level determination method
-#
-################################################################################
+""" Description:
 
-"""
-
-----------------------------------------------------------------"
- CONTPY: A statistical continuum level determination method for"
+----------------------------------------------------------------
+ CONTPY: A statistical continuum level determination method for
          line-rich sources"
- "
- Sanchez-Monge et al (2017, A&A, submitted)              v 1.0.0"
- "
+
+ Sanchez-Monge et al (2017, A&A, submitted)
+ version 1.0.0
 
 """
-
-
-################################################################################
-#
-# Importing packages and general setup:
-#
 
 from __future__ import print_function
-import os
 
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import gridspec
@@ -36,46 +24,46 @@ from scipy.optimize import leastsq
 
 from . import fits_cutout
 
+def process_files(iname=False,
+                  ifile=False,
+                  ispec=False,
+                  imerge=False,
+                  ipath=False,
+                  rms_noise=None,
+                  continuum=False,
+                  cmax=False,
+                  cmean=False,
+                  cmedian=False,
+                  cpercent=False,
+                  cKDEmax=False,
+                  cGaussian=False,
+                  csigmaclip=False,
+                  cfree=False,
+                  spindex=False,
+                  plots=False,
+                  cutout=False,
+                  verbose=False):
 
-
-################################################################################
-#
-# Main code: Reading data and header, and determining the continuum level:
-#
-
-def process_files(ispec=False, iname=False, ifile=False, ipath=False,
-                  rms_noise=None, continuum=False, cmax=False, cmean=False,
-                  cmedian=False, cpercent=False, cKDEmax=False,
-                  cGaussian=False, cfree=False, csigmaclip=False, cutout=False,
-                  spindex=False, verbose=False, plots=False, imerge=False):
-
-    ################################################################################
-    #
-    # List of files/datacubes to be analyzed:
-    #
-
+    # Read name of files to be processed
+    # - for FITS file (extension if .fits)
     if iname:
         input_files = iname
         extension = '.fits'
 
+    # - for a list of FITS files (extension of files is .fits)
     elif ifile:
         print(ifile[0])
         lines = [line.rstrip('\n') for line in open(ifile[0])]
         input_files = lines
         extension = '.fits'
 
+    # - for an ASCII file (extension is .dat)
     elif ispec:
         input_files = ispec
         extension = '.dat'
         verbose = True
 
-
-
-    ################################################################################
-    #
-    # Definition of directories:
-    #
-
+    # Create directories and define working paths
     os.system('mkdir -p data/')
     os.system('mkdir -p products/')
 
@@ -83,14 +71,13 @@ def process_files(ispec=False, iname=False, ifile=False, ipath=False,
     cont_path = "products/"
     line_path = cont_path
 
+    # Define sub-directory (within data/) containing the files to be processed
     if ipath:
         source = ipath[0]
         sourcedir = source + '/'
         data_path = data_path + sourcedir
         cutout_path = data_path + 'cutout/'
         os.system('mkdir -p ' + cutout_path)
-        merged_path = data_path + 'merged/'
-        os.system('mkdir -p ' + merged_path)
         cont_path = cont_path + sourcedir
         os.system('mkdir -p ' + cont_path)
         line_path = line_path + sourcedir
@@ -99,15 +86,8 @@ def process_files(ispec=False, iname=False, ifile=False, ipath=False,
     plots_path = cont_path + 'plots/'
     os.system('mkdir -p ' + plots_path)
 
-
-
-
-    ################################################################################
-    #
-    # Setting the path and file names
-    # ... and in case of fits files, using cutout to create smaller files:
-    #
-
+    # Set path and file names ...
+    # ... and in case of FITS files, use cutout to create smaller files
     if ispec:
         tmp_files = []
         for file_name in input_files:
@@ -138,74 +118,19 @@ def process_files(ispec=False, iname=False, ifile=False, ipath=False,
                 tmp_file = file_name
                 tmp_files.append(tmp_file)
 
-
-
-    ################################################################################
-    #
-    # Merging the files, in case this is required:
-    #
-
+    # Merge FITS files if required
     if imerge:
         print("+++ Merging files ...")
         
-        #
-        # name of the output file
-        merged_file_name = imerge[0]
+        merged_path = data_path + 'merged/'
+        os.system('mkdir -p ' + merged_path)
 
-        #
-        # defining ranges for channels
-        ninterval = len(tmp_files)
-        bnchan = np.empty([ninterval])
-        enchan = np.empty([ninterval])
+        # Name of the output file
+        merged_file_name = imerge[0]  
 
-        #
-        # total number of channels of merged file
-        icount = 0
-        for tmp_file in tmp_files:
-            
-            header = fits.getheader(tmp_path + tmp_file + extension)
-            ndim = header.get('NAXIS')
-            nxpix = header.get('NAXIS1')
-            nypix = header.get('NAXIS2')
-            nchan = header.get('NAXIS3')
-            npolz = header.get('NAXIS4')
-            
-            if icount == 0:
-                bnchan[icount] = 0
-                enchan[icount] = nchan
-            else:
-                jcount = icount-1
-                bnchan[icount] = enchan[jcount]
-                enchan[icount] = nchan+enchan[jcount]
-                
-            icount = icount + 1
+        tmp_files, tmp_path, unmerged_files, unmerged_path = i_merge(tmp_files, tmp_path, extension, merged_file_name, merged_path)
 
-        #
-        # creating output merged file
-        merged_data = np.empty([npolz,enchan[icount-1],nypix,nxpix])
-        
-        #
-        # writing the data on the new merged file
-        icount = 0
-        for tmp_file in tmp_files:
-            
-            data = fits.getdata(tmp_path + tmp_file + extension)
-            merged_data[0,bnchan[icount]:enchan[icount],:,:] = data
-            icount = icount + 1
-
-        merged_file = merged_path + merged_file_name + extension
-        os.system('rm -rf ' + merged_file)
-        fits.writeto(merged_file, np.float32(merged_data), header=header, clobber=True)
-        
-        unmerged_files = tmp_files
-        unmerged_path = tmp_path
-        tmp_files = []
-        tmp_files.append(merged_file_name)
-        tmp_path = merged_path
-
-
-    #
-    # loop through all the files that will be processed
+    # Loop through all the files that will be processed
     for tmp_file in tmp_files:
 
         print("")
@@ -648,133 +573,134 @@ def process_files(ispec=False, iname=False, ifile=False, ipath=False,
                     np.savetxt(noise_file_GaussNw, continuum_noise_GaussNw)
 
 
-
-    if imerge:
-
-        #
-        # re-setting the varibles to the unmerged files
-        tmp_path = unmerged_path
-        tmp_files = unmerged_files
-
-    for tmp_file in tmp_files:
-
+    if continuum:
+        
         if imerge:
 
             #
-            # copy of the merged continuuum to single continuum files
-            # for each one of the files used in the merging
-            os.system('cp -rp ' + continuum_file_sigmaclip + ' ' + cont_path + tmp_file + '_continuum' + extension)
+            # re-setting the varibles to the unmerged files
+            tmp_path = unmerged_path
+            tmp_files = unmerged_files
 
-        #
-        # subtraction of the continuum to the data file
-        # it produces a line-only cube and a continuum-only file
-        if cfree is True:
+        for tmp_file in tmp_files:
 
-            print("")
-            print("... REMOVING CONTINUUM FROM DATA ... " + tmp_path + tmp_file + extension)
+            if imerge:
+
+                #
+                # copy of the merged continuuum to single continuum files
+                # for each one of the files used in the merging
+                os.system('cp -rp ' + continuum_file_sigmaclip + ' ' + cont_path + tmp_file + '_continuum' + extension)
 
             #
-            # defining the cube file (original file)
-            # and the continuum file
-            cube_file = tmp_path + tmp_file + extension
-            cont_files = []
-            cont_files.append(tmp_file + '_continuum')
+            # subtraction of the continuum to the data file
+            # it produces a line-only cube and a continuum-only file
+            if cfree is True:
 
-            print(" ")
-            print("... FILEs CREATED: ")
-
-            for cont_file in cont_files:
+                print("")
+                print("... REMOVING CONTINUUM FROM DATA ... " + tmp_path + tmp_file + extension)
 
                 #
-                # for ascii files
-                if ispec:
+                # defining the cube file (original file)
+                # and the continuum file
+                cube_file = tmp_path + tmp_file + extension
+                cont_files = []
+                cont_files.append(tmp_file + '_continuum')
 
-                    fdata_cont = open(cont_path + cont_file + extension, 'r')
+                print(" ")
+                print("... FILEs CREATED: ")
 
-                    for line in fdata_cont:
-
-                        data_cont = float(line.strip())
-
-                    line_outfile = line_path + cont_file + '.line' + extension
-                    ascii.write((freqs, flux[:]-data_cont), output=line_outfile)
-
-                    print("  . " + line_outfile)
-
-                #
-                # for fits files
-                if iname or ifile:
-
-                    data_cube = fits.getdata(cube_file)
-                    header_cube = fits.getheader(cube_file)
-                    data_cont = fits.getdata(cont_path + cont_file + extension)
-                    header_cont = fits.getheader(cont_path + cont_file + extension)
+                for cont_file in cont_files:
 
                     #
-                    # to determine a general noise to be considered
-                    nxpix = header_cube.get('NAXIS1')
-                    rmspix = int(nxpix / 8)
-                    npixmin = 30
+                    # for ascii files
+                    if ispec:
+
+                        fdata_cont = open(cont_path + cont_file + extension, 'r')
+
+                        for line in fdata_cont:
+
+                            data_cont = float(line.strip())
+
+                        line_outfile = line_path + cont_file + '.line' + extension
+                        ascii.write((freqs, flux[:]-data_cont), output=line_outfile)
+
+                        print("  . " + line_outfile)
 
                     #
-                    # to calculate the rms noise level in four different regions
-                    # throughout the continuum fits file
-                    if nxpix > npixmin:
-                        rms = []
-                        rms.append(np.mean(data_cont[rmspix*1:rmspix*2,rmspix*1:rmspix*2]))
-                        rms.append(np.mean(data_cont[rmspix*1:rmspix*2,rmspix*2:rmspix*3]))
-                        rms.append(np.mean(data_cont[rmspix*1:rmspix*2,rmspix*5:rmspix*6]))
-                        rms.append(np.mean(data_cont[rmspix*1:rmspix*2,rmspix*6:rmspix*7]))
+                    # for fits files
+                    if iname or ifile:
+
+                        data_cube = fits.getdata(cube_file)
+                        header_cube = fits.getheader(cube_file)
+                        data_cont = fits.getdata(cont_path + cont_file + extension)
+                        header_cont = fits.getheader(cont_path + cont_file + extension)
+
                         #
-                        rms.append(np.mean(data_cont[rmspix*2:rmspix*3,rmspix*1:rmspix*2]))
-                        rms.append(np.mean(data_cont[rmspix*2:rmspix*3,rmspix*2:rmspix*3]))
-                        rms.append(np.mean(data_cont[rmspix*2:rmspix*3,rmspix*5:rmspix*6]))
-                        rms.append(np.mean(data_cont[rmspix*2:rmspix*3,rmspix*6:rmspix*7]))
+                        # to determine a general noise to be considered
+                        nxpix = header_cube.get('NAXIS1')
+                        rmspix = int(nxpix / 8)
+                        npixmin = 30
+
                         #
-                        rms.append(np.mean(data_cont[rmspix*5:rmspix*6,rmspix*1:rmspix*2]))
-                        rms.append(np.mean(data_cont[rmspix*5:rmspix*6,rmspix*2:rmspix*3]))
-                        rms.append(np.mean(data_cont[rmspix*5:rmspix*6,rmspix*5:rmspix*6]))
-                        rms.append(np.mean(data_cont[rmspix*5:rmspix*6,rmspix*6:rmspix*7]))
+                        # to calculate the rms noise level in four different regions
+                        # throughout the continuum fits file
+                        if nxpix > npixmin:
+                            rms = []
+                            rms.append(np.mean(data_cont[rmspix*1:rmspix*2,rmspix*1:rmspix*2]))
+                            rms.append(np.mean(data_cont[rmspix*1:rmspix*2,rmspix*2:rmspix*3]))
+                            rms.append(np.mean(data_cont[rmspix*1:rmspix*2,rmspix*5:rmspix*6]))
+                            rms.append(np.mean(data_cont[rmspix*1:rmspix*2,rmspix*6:rmspix*7]))
+                            #
+                            rms.append(np.mean(data_cont[rmspix*2:rmspix*3,rmspix*1:rmspix*2]))
+                            rms.append(np.mean(data_cont[rmspix*2:rmspix*3,rmspix*2:rmspix*3]))
+                            rms.append(np.mean(data_cont[rmspix*2:rmspix*3,rmspix*5:rmspix*6]))
+                            rms.append(np.mean(data_cont[rmspix*2:rmspix*3,rmspix*6:rmspix*7]))
+                            #
+                            rms.append(np.mean(data_cont[rmspix*5:rmspix*6,rmspix*1:rmspix*2]))
+                            rms.append(np.mean(data_cont[rmspix*5:rmspix*6,rmspix*2:rmspix*3]))
+                            rms.append(np.mean(data_cont[rmspix*5:rmspix*6,rmspix*5:rmspix*6]))
+                            rms.append(np.mean(data_cont[rmspix*5:rmspix*6,rmspix*6:rmspix*7]))
+                            #
+                            rms.append(np.mean(data_cont[rmspix*6:rmspix*7,rmspix*1:rmspix*2]))
+                            rms.append(np.mean(data_cont[rmspix*6:rmspix*7,rmspix*2:rmspix*3]))
+                            rms.append(np.mean(data_cont[rmspix*6:rmspix*7,rmspix*5:rmspix*6]))
+                            rms.append(np.mean(data_cont[rmspix*6:rmspix*7,rmspix*6:rmspix*7]))
+
+                            #print(np.median(rms))
+                            data_finalcont = data_cont + np.absolute(np.median(rms))
+                            data_line = data_cube - (data_cont + np.absolute(np.median(rms)))
+
                         #
-                        rms.append(np.mean(data_cont[rmspix*6:rmspix*7,rmspix*1:rmspix*2]))
-                        rms.append(np.mean(data_cont[rmspix*6:rmspix*7,rmspix*2:rmspix*3]))
-                        rms.append(np.mean(data_cont[rmspix*6:rmspix*7,rmspix*5:rmspix*6]))
-                        rms.append(np.mean(data_cont[rmspix*6:rmspix*7,rmspix*6:rmspix*7]))
+                        # if the size of the map is too small (less than 100x100 pixels)
+                        # no rms noise level is subtracted
+                        else:
 
-                        #print(np.median(rms))
-                        data_finalcont = data_cont + np.absolute(np.median(rms))
-                        data_line = data_cube - (data_cont + np.absolute(np.median(rms)))
+                            print("  . WARNING: The image has less than %i pixels" % (npixmin))
+                            print("  .          No residual noise level subtracted for")
+                            print("  .          %s " % (cube_file))
 
-                    #
-                    # if the size of the map is too small (less than 100x100 pixels)
-                    # no rms noise level is subtracted
-                    else:
+                            data_finalcont = data_cont
+                            data_line = data_cube - data_cont
 
-                        print("  . WARNING: The image has less than %i pixels" % (npixmin))
-                        print("  .          No residual noise level subtracted for")
-                        print("  .          %s " % (cube_file))
+                        cont_outfile = cont_path + cont_file + '.cont' + extension
+                        line_outfile = line_path + cont_file + '.line' + extension
 
-                        data_finalcont = data_cont
-                        data_line = data_cube - data_cont
+                        os.system('rm -rf ' + cont_outfile)
+                        fits.writeto(cont_outfile, np.float32(data_finalcont), header=header_cont, clobber=True)
 
-                    cont_outfile = cont_path + cont_file + '.cont' + extension
-                    line_outfile = line_path + cont_file + '.line' + extension
+                        os.system('rm -rf ' + line_outfile)
+                        fits.writeto(line_outfile, np.float32(data_line), header=header_cube, clobber=True)
 
-                    os.system('rm -rf ' + cont_outfile)
-                    fits.writeto(cont_outfile, np.float32(data_finalcont), header=header_cont, clobber=True)
+                        #
+                        # creating a line-only cube
+                        # replacing the old continuum-only image by the new one
+                        os.system('mv ' + cont_path + cont_file + extension + ' ' + cont_path + cont_file + '_original' + extension)
+                        os.system('mv ' + cont_outfile + ' ' + cont_path + cont_file + extension)
+                        os.system('mv ' + line_outfile + ' ' + cont_path + tmp_file + '_line' + extension)
 
-                    os.system('rm -rf ' + line_outfile)
-                    fits.writeto(line_outfile, np.float32(data_line), header=header_cube, clobber=True)
-
-                    #
-                    # creating a line-only cube
-                    # replacing the old continuum-only image by the new one
-                    os.system('mv ' + cont_path + cont_file + extension + ' ' + cont_path + cont_file + '_original' + extension)
-                    os.system('mv ' + cont_outfile + ' ' + cont_path + cont_file + extension)
-                    os.system('mv ' + line_outfile + ' ' + cont_path + tmp_file + '_line' + extension)
-
-                    print("  . " + cont_path + tmp_file + '_continuum' + extension)
-                    print("  . " + cont_path + tmp_file + '_noise' + extension)
-                    print("  . " + cont_path + tmp_file + '_line' + extension)
+                        print("  . " + cont_path + tmp_file + '_continuum' + extension)
+                        print("  . " + cont_path + tmp_file + '_noise' + extension)
+                        print("  . " + cont_path + tmp_file + '_line' + extension)
 
     #
     # combintation of several continuum files to determine the spectral index
@@ -896,6 +822,98 @@ def process_files(ispec=False, iname=False, ifile=False, ipath=False,
         print("... FILEs CREATED are found in " + cont_path)
         print("  . search for spindex, cont_model and line_cont_model")
         print(" ")
+
+def i_merge(tmp_files, tmp_path, extension, merged_file_name, merged_path):
+    """
+    Merge files to be processed into one single output merged file
+    
+    Parameters
+    ----------
+    tmp_files : np.ndarray
+    tmp_path : string
+        One-dimension array with the names of the files to be merged
+        and path where the files are saved
+    extension : string
+        Extension of the input files, either .fits or .dat
+    merged_file_name : string
+    merged_path : string
+        Strings with the name of the output merged file and the
+        path to this file
+    
+    Returns
+    -------
+    tmp_files : np.ndarray
+        One-dimension array with the name of the merged file
+    tmp_path : np.ndarray
+        One-dimension array with the path to the merged file
+    unmerged_files : np.ndarray
+        One-dimension array with the names of the individual files
+        that were merged
+    unmerged_path : np.ndarray
+        One-dimension array with the path to the individual files
+    """
+    
+    merged_file = merged_path + merged_file_name + extension
+    print (merged_file)
+    
+    if extension=='.dat':
+        filenames = []
+        for tmp_file in tmp_files:
+            filenames.append(tmp_path+tmp_file+extension)
+        with open(merged_file, 'w') as outfile:
+            for fname in filenames:
+                with open(fname) as infile:
+                    for line in infile:
+                        outfile.write(line)
+    
+    if extension=='.fits':
+        # Define ranges for channels, to combine all the files
+        ninterval = len(tmp_files)
+        bnchan = np.empty([ninterval])
+        enchan = np.empty([ninterval])
+
+        # Determine the total number of channels (icount) of the merged file
+        icount = 0
+        for tmp_file in tmp_files:
+
+            header = fits.getheader(tmp_path + tmp_file + extension)
+            ndim = header.get('NAXIS')
+            nxpix = header.get('NAXIS1')
+            nypix = header.get('NAXIS2')
+            nchan = header.get('NAXIS3')
+            npolz = header.get('NAXIS4')
+
+            if icount == 0:
+                bnchan[icount] = 0
+                enchan[icount] = nchan
+            else:
+                jcount = icount-1
+                bnchan[icount] = enchan[jcount]
+                enchan[icount] = nchan+enchan[jcount]
+        
+            icount = icount + 1
+
+        # Create output merged file
+        merged_data = np.empty([npolz,enchan[icount-1],nypix,nxpix])
+        
+        # Write data to the new merged file
+        icount = 0
+        for tmp_file in tmp_files:
+            data = fits.getdata(tmp_path + tmp_file + extension)
+            merged_data[0,bnchan[icount]:enchan[icount],:,:] = data
+            icount = icount + 1
+
+        os.system('rm -rf ' + merged_file)
+        fits.writeto(merged_file, np.float32(merged_data), header=header, clobber=True)
+        
+    # Keep track of the individual file names, and the merged file
+    unmerged_files = tmp_files
+    unmerged_path = tmp_path
+    tmp_files = []
+    tmp_files.append(merged_file_name)
+    tmp_path = merged_path
+    
+    return tmp_files, tmp_path, unmerged_files, unmerged_path
 
 
 def cont_histo(flux, rms_noise):

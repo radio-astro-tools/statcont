@@ -12,6 +12,7 @@
 from __future__ import print_function
 
 import os
+import warnings
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import gridspec
@@ -21,8 +22,6 @@ from astropy.io import fits
 from astropy.stats import sigma_clip
 from scipy import stats
 from scipy.optimize import leastsq
-
-from . import fits_cutout
 
 def process_files(iname=False,
                   ifile=False,
@@ -107,7 +106,7 @@ def process_files(iname=False,
                 if verbose:
                     print("  . Cutout of %s \n    at central pixel %i, %i with size %i" % (data_fitsfile, central_xpixel, central_ypixel, number_pixels))
                 cutout_fitsfile = cutout_path + file_name + '_cutout' + extension
-                fits_cutout.cutout(data_fitsfile, central_xpixel, central_ypixel, number_pixels, cutout_fitsfile)
+                fits_cutout(data_fitsfile, central_xpixel, central_ypixel, number_pixels, cutout_fitsfile)
                 tmp_path = cutout_path
                 tmp_file = file_name + '_cutout'
                 tmp_files.append(tmp_file)
@@ -136,8 +135,7 @@ def process_files(iname=False,
         print("")
         print("+++ PROCESSING " + tmp_path + tmp_file + extension)
 
-        #
-        # reading data and header of the fits file
+        # Read data and header of the FITS file
         if iname or ifile:
 
             header = fits.getheader(tmp_path + tmp_file + extension)
@@ -147,27 +145,23 @@ def process_files(iname=False,
             nxpix = header.get('NAXIS1')
             nypix = header.get('NAXIS2')
             nchan = header.get('NAXIS3')
-            # not used npolz = header.get('NAXIS4')
+            npolz = header.get('NAXIS4')
             bunit = header.get('BUNIT')
 
-        #
-        # reading the data and header of the ascii/spectrum file
+        # Read data and header of the ASCII file
         if ispec:
 
             specfile = open(tmp_path + tmp_file + extension, 'r')
 
             nxpix = 1
             nypix = 1
-            nchan = 1
-            # not used npolz = 1
+            nchan = 1 # will be updated to the real value later
+            npolz = 1
 
-        #
-        # loop through the y and x pixels to determine the continuum level
+        # Loop through the y and x pixels to determine the continuum level
         if continuum:
 
-            #
-            # setting up the variables that will contain
-            # the continuum level and the uncertainty (dispersion)
+            # Set up the variables that will contain the continuum level and noise
             if cmax:
                 continuum_flux_maximum = []
             if cmean:
@@ -190,8 +184,7 @@ def process_files(iname=False,
                 continuum_flux_sigmaclip = []
                 continuum_noise_sigmaclip = []
 
-            #
-            # loop through y pixels
+            # Loop through y pixels
             for ypix in range(nypix):
 
                 print("... analyzing column " + str(ypix+1) + " out of " + str(nypix))
@@ -218,28 +211,23 @@ def process_files(iname=False,
                     continuum_flux_sigmaclip.append([])
                     continuum_noise_sigmaclip.append([])
 
-                #
-                # loop through x pixels
+                # Loop through x pixels
                 for xpix in range(nxpix):
 
-                    #
-                    # for fits files
+                    # For FITS files
                     if iname or ifile:
 
                         if verbose:
                             print("  . corresponding to pixel " + str(xpix+1) + "," + str(ypix+1))
 
-                        #
-                        # writting the intensity of a given pixel for all the channels
-                        # into the array flux
+                        # Write the intensity of a given pixel for all the channels into the array flux
                         if ndim == 4:
                             flux = data[0, :, ypix, xpix]
 
                         if ndim == 3:
                             flux = data[:, ypix, xpix]
 
-                        #
-                        # writting the frequencies (in GHz) in the array freqs
+                        # Write the frequencies in the array freqs
                         chans = []
                         freqs = []
                         for channel in range(nchan):
@@ -247,14 +235,11 @@ def process_files(iname=False,
                             freqs.append((header.get('CRVAL3') + (channel - header.get('CRPIX3') - 1) * header.get('CDELT3')) / 1.e9)
                         freq = np.array(freqs)
 
-
-                    #
-                    # for ascii files
+                    # For ASCII files
                     if ispec:
 
-                        #
-                        # writting the intensity of a given pixel for all the channels
-                        # into the array flux
+                        # Write the intensity of a given pixel for all the channels into the array flux
+                        # and the frequencies in the array freqs
                         lflux = []
                         freqs = []
                         for line in specfile:
@@ -265,7 +250,7 @@ def process_files(iname=False,
                         nchan = len(flux)
                         flux = flux
 
-                    # CONTINUUM FLUX as the maximum of the histogram
+                    # Determine CONTINUUM as the MAXIMUM of the histogram
                     if cmax:
                         maximum_flux = c_max(flux, rms_noise)
 
@@ -274,7 +259,7 @@ def process_files(iname=False,
                         if verbose:
                             print("    flux of maximum      = " + str(int(maximum_flux*1.e5)/1.e5))
 
-                    # CONTINUUM FLUX as the mean of the histogram
+                    # Determine CONTINUUM as the MEAN of the intensities
                     if cmean:
                         mean_flux, meansel_flux = c_mean(flux, rms_noise)
 
@@ -285,7 +270,7 @@ def process_files(iname=False,
                             print("    flux of mean (all)   = " + str(int(mean_flux*1.e5)/1.e5))
                             print("    flux of mean (sel)   = " + str(int(meansel_flux*1.e5)/1.e5))
 
-                    # CONTINUUM FLUX as the median of the histogram
+                    # Determine CONTINUUM as the MEDIAN of the intensities
                     if cmedian:
                         median_flux, mediansel_flux = c_median(flux, rms_noise)
 
@@ -296,7 +281,7 @@ def process_files(iname=False,
                             print("    flux of median (all) = " + str(int(median_flux*1.e5)/1.e5))
                             print("    flux of median (sel) = " + str(int(mediansel_flux*1.e5)/1.e5))
 
-                    # CONTINUUM FLUX as the percentile(s) of the histogram
+                    # Determine CONTINUUM as the 25th and 75th percentiles of the intensities
                     if cpercent:
                         percent25_flux = c_percent(flux, percentile=25)
                         percent75_flux = c_percent(flux, percentile=75)
@@ -309,7 +294,7 @@ def process_files(iname=False,
                             print("    flux of percent 75   = " + str(int(percent75_flux*1.e5)/1.e5))
 
 
-                    # CONTINUUM FLUX as the maximum of a KDE distribution
+                    # Determine CONTINUUM as the maximum of a KDE distribution
                     if cKDEmax:
                         KDEmax_flux = c_KDEmax(flux, rms_noise)
 
@@ -318,7 +303,7 @@ def process_files(iname=False,
                         if verbose:
                             print("    flux of KDEmax       = " + str(int(KDEmax_flux*1.e5)/1.e5))
 
-                    # CONTINUUM FLUX from a global Gaussian fit
+                    # Determine CONTINUUM as the center of a GAUSSIAN fit to the histogram
                     if cGaussian:
                         
                         Gaussian_flux, Gaussian_noise, GaussNw_flux, GaussNw_noise = c_Gaussian(flux, rms_noise)
@@ -332,13 +317,10 @@ def process_files(iname=False,
                             print("    flux of Gaussian     = " + str(int(Gaussian_flux*1.e5)/1.e5) + " +/- " + str(int(Gaussian_noise*1.e5)/1.e5))
                             print("    flux of Gauss (sel)  = " + str(int(GaussNw_flux*1.e5)/1.e5) + " +/- " + str(int(GaussNw_noise*1.e5)/1.e5))
 
-                    # CONTINUUM FLUX from the method of sigma-clipping
+                    # Determine CONTINUUM using a corrected version of SIGMA-CLIPPING
                     if csigmaclip:
 
                         sigmaclip_flux, sigmaclip_noise = c_sigmaclip(flux, rms_noise)
-
-                        # determination of the continuum level (mean)
-                        # and noise/uncertainty (dispersion/standard deviation)
 
                         continuum_flux_sigmaclip[ypix].append(sigmaclip_flux)
                         continuum_noise_sigmaclip[ypix].append(sigmaclip_noise)
@@ -346,8 +328,7 @@ def process_files(iname=False,
                         if verbose:
                             print("    flux of sigma-clip   = " + str(int(sigmaclip_flux*1.e5)/1.e5) + " +/- " + str(int(sigmaclip_noise*1.e5)/1.e5))
 
-                    #
-                    # creating some plots with spectra and continuum levels
+                    # Create plots with spectra and different continuum levels
                     if plots:
                         fig_file = plots_path + tmp_file + '_' + str(xpix+1) + '_' + str(ypix+1) + '.png'
                         fig1 = plt.figure()
@@ -412,196 +393,102 @@ def process_files(iname=False,
                                 ax1.text(0.4, 0.0, "corrSigma-clip = " + str(int(sigmaclip_flux*1.e5)/1.e5) + " " + bunit + " (+/- " + str(int(sigmaclip_noise*1.e5)/1.e5) + ")")
                             if ispec:
                                 ax1.text(0.4, 0.0, "corrSigma-clip = " + str(int(sigmaclip_flux*1.e5)/1.e5) + " (+/- " + str(int(sigmaclip_noise*1.e5)/1.e5) + ")")
-                        plt.xlabel('Frequency (GHz)')
+                        plt.xlabel('Frequency')
                         plt.ylabel('Intensity')
 
                         fig1.savefig(fig_file)
                         plt.close(fig1)
 
-            #
-            # writing the output continuum fits file
-            if cfree is False:
-                print(" ")
-                print("... CONTINUUM FILEs CREATED: ")
+            # Write the output continuum file
+            print(" ")
+            print("... CONTINUUM FILEs CREATED: ")
 
-            # CONTINUUM FLUX for the sigma-clipping method
-            #
-            # for the continuum level
-            continuum_file_sigmaclip = cont_path + tmp_file + '_continuum' + extension
-            os.system('rm -rf ' + continuum_file_sigmaclip)
-            if cfree is False:
-                print("  . " + continuum_file_sigmaclip)
-            if iname or ifile:
-                fits.writeto(continuum_file_sigmaclip, np.float32(continuum_flux_sigmaclip), header=header, clobber=True)
-            if ispec:
-                np.savetxt(continuum_file_sigmaclip, continuum_flux_sigmaclip)
-            #
-            # for the error/noise on the continuum level
-            noise_file_sigmaclip = cont_path + tmp_file + '_noise' + extension
-            os.system('rm -rf ' + noise_file_sigmaclip)
-            if cfree is False:
-                print("  . " + noise_file_sigmaclip)
-            if iname or ifile:
-                fits.writeto(noise_file_sigmaclip, np.float32(continuum_noise_sigmaclip), header=header, clobber=True)
-            if ispec:
-                np.savetxt(noise_file_sigmaclip, continuum_noise_sigmaclip)
 
-            # CONTINUUM FLUX for the maximum method
+            # Create output files with the CONTINUUM estimated values
+            output_files = []
+            output_fluxs = []
+
             if cmax:
-                #
-                continuum_file_maximum = cont_path + tmp_file + '_continuum_maximum' + extension
-                os.system('rm -rf ' + continuum_file_maximum)
-                if cfree is False:
-                    print("  . " + continuum_file_maximum)
-                if iname or ifile:
-                    fits.writeto(continuum_file_maximum, np.float32(continuum_flux_maximum), header=header, clobber=True)
-                if ispec:
-                    np.savetxt(continuum_file_maximum, continuum_flux_maximum)
 
-            # CONTINUUM FLUX for the mean method
+                output_files.append(cont_path + tmp_file + '_continuum_maximum' + extension)
+                output_fluxs.append(continuum_flux_maximum)
+
             if cmean:
-                #
-                continuum_file_mean = cont_path + tmp_file + '_continuum_mean' + extension
-                os.system('rm -rf ' + continuum_file_mean)
-                if cfree is False:
-                    print("  . " + continuum_file_mean)
-                if iname or ifile:
-                    fits.writeto(continuum_file_mean, np.float32(continuum_flux_mean), header=header, clobber=True)
-                if ispec:
-                    np.savetxt(continuum_file_mean, continuum_flux_mean)
-                #
-                continuum_file_meansel = cont_path + tmp_file + '_continuum_meansel' + extension
-                os.system('rm -rf ' + continuum_file_meansel)
-                if cfree is False:
-                    print("  . " + continuum_file_meansel)
-                if iname or ifile:
-                    fits.writeto(continuum_file_meansel, np.float32(continuum_flux_meansel), header=header, clobber=True)
-                if ispec:
-                    np.savetxt(continuum_file_meansel, continuum_flux_meansel)
 
-            # CONTINUUM FLUX for the median method
+                output_files.append(cont_path + tmp_file + '_continuum_mean' + extension)
+                output_fluxs.append(continuum_flux_mean)
+                output_files.append(cont_path + tmp_file + '_continuum_meansel' + extension)
+                output_fluxs.append(continuum_flux_meansel)
+
             if cmedian:
-                #
-                continuum_file_median = cont_path + tmp_file + '_continuum_median' + extension
-                os.system('rm -rf ' + continuum_file_median)
-                if cfree is False:
-                    print("  . " + continuum_file_median)
-                if iname or ifile:
-                    fits.writeto(continuum_file_median, np.float32(continuum_flux_median), header=header, clobber=True)
-                if ispec:
-                    np.savetxt(continuum_file_median, continuum_flux_median)
-                #
-                continuum_file_mediansel = cont_path + tmp_file + '_continuum_mediansel' + extension
-                os.system('rm -rf ' + continuum_file_mediansel)
-                if cfree is False:
-                    print("  . " + continuum_file_mediansel)
-                if iname or ifile:
-                    fits.writeto(continuum_file_mediansel, np.float32(continuum_flux_mediansel), header=header, clobber=True)
-                if ispec:
-                    np.savetxt(continuum_file_mediansel, continuum_flux_mediansel)
 
-            # CONTINUUM FLUX for the percentile(s) method
+                output_files.append(cont_path + tmp_file + '_continuum_median' + extension)
+                output_fluxs.append(continuum_flux_median)
+                output_files.append(cont_path + tmp_file + '_continuum_mediansel' + extension)
+                output_fluxs.append(continuum_flux_mediansel)
+
             if cpercent:
-                #
-                continuum_file_percent25 = cont_path + tmp_file + '_continuum_percent25' + extension
-                os.system('rm -rf ' + continuum_file_percent25)
-                if cfree is False:
-                    print("  . " + continuum_file_percent25)
-                if iname or ifile:
-                    fits.writeto(continuum_file_percent25, np.float32(continuum_flux_percent25), header=header, clobber=True)
-                if ispec:
-                    np.savetxt(continuum_file_percent25, continuum_flux_percent25)
-                #
-                continuum_file_percent75 = cont_path + tmp_file + '_continuum_percent75' + extension
-                os.system('rm -rf ' + continuum_file_percent75)
-                if cfree is False:
-                    print("  . " + continuum_file_percent75)
-                if iname or ifile:
-                    fits.writeto(continuum_file_percent75, np.float32(continuum_flux_percent75), header=header, clobber=True)
-                if ispec:
-                    np.savetxt(continuum_file_percent75, continuum_flux_percent75)
 
-            # CONTINUUM FLUX for the KDEmax method
+                output_files.append(cont_path + tmp_file + '_continuum_percent25' + extension)
+                output_fluxs.append(continuum_flux_percent25)
+                output_files.append(cont_path + tmp_file + '_continuum_percent75' + extension)
+                output_fluxs.append(continuum_flux_percent75)
+
             if cKDEmax:
-                #
-                continuum_file_KDEmax = cont_path + tmp_file + '_continuum_KDEmax' + extension
-                os.system('rm -rf ' + continuum_file_KDEmax)
-                if cfree is False:
-                    print("  . " + continuum_file_KDEmax)
-                if iname or ifile:
-                    fits.writeto(continuum_file_KDEmax, np.float32(continuum_flux_KDEmax), header=header, clobber=True)
-                if ispec:
-                    np.savetxt(continuum_file_KDEmax, continuum_flux_KDEmax)
 
-            # CONTINUUM FLUX for the Gaussian method
+                output_files.append(cont_path + tmp_file + '_continuum_KDEmax' + extension)
+                output_fluxs.append(continuum_flux_KDEmax)
+
             if cGaussian:
-                #
-                continuum_file_Gaussian = cont_path + tmp_file + '_continuum_Gaussian' + extension
-                os.system('rm -rf ' + continuum_file_Gaussian)
-                if cfree is False:
-                    print("  . " + continuum_file_Gaussian)
-                if iname or ifile:
-                    fits.writeto(continuum_file_Gaussian, np.float32(continuum_flux_Gaussian), header=header, clobber=True)
-                if ispec:
-                    np.savetxt(continuum_file_Gaussian, continuum_flux_Gaussian)
-                #
-                noise_file_Gaussian = cont_path + tmp_file + '_noise_Gaussian' + extension
-                os.system('rm -rf ' + noise_file_Gaussian)
-                if cfree is False:
-                    print("  . " + noise_file_Gaussian)
-                if iname or ifile:
-                    fits.writeto(noise_file_Gaussian, np.float32(continuum_noise_Gaussian), header=header, clobber=True)
-                if ispec:
-                    np.savetxt(noise_file_Gaussian, continuum_noise_Gaussian)
-                #
-                continuum_file_GaussNw = cont_path + tmp_file + '_continuum_GaussNw' + extension
-                os.system('rm -rf ' + continuum_file_GaussNw)
-                if cfree is False:
-                    print("  . " + continuum_file_GaussNw)
-                if iname or ifile:
-                    fits.writeto(continuum_file_GaussNw, np.float32(continuum_flux_GaussNw), header=header, clobber=True)
-                if ispec:
-                    np.savetxt(continuum_file_GaussNw, continuum_flux_GaussNw)
-                #
-                noise_file_GaussNw = cont_path + tmp_file + '_noise_GaussNw' + extension
-                os.system('rm -rf ' + noise_file_GaussNw)
-                if cfree is False:
-                    print("  . " + noise_file_GaussNw)
-                if iname or ifile:
-                    fits.writeto(noise_file_GaussNw, np.float32(continuum_noise_GaussNw), header=header, clobber=True)
-                if ispec:
-                    np.savetxt(noise_file_GaussNw, continuum_noise_GaussNw)
 
+                output_files.append(cont_path + tmp_file + '_continuum_Gaussian' + extension)
+                output_fluxs.append(continuum_flux_Gaussian)
+                output_files.append(cont_path + tmp_file + '_noise_Gaussian' + extension)
+                output_fluxs.append(continuum_noise_Gaussian)
+                output_files.append(cont_path + tmp_file + '_continuum_GaussNw' + extension)
+                output_fluxs.append(continuum_flux_GaussNw)
+                output_files.append(cont_path + tmp_file + '_noise_GaussNW' + extension)
+                output_fluxs.append(continuum_noise_GaussNw)
+
+            if csigmaclip:
+
+                output_files.append(cont_path + tmp_file + '_continuum' + extension)
+                output_fluxs.append(continuum_flux_sigmaclip)
+                output_files.append(cont_path + tmp_file + '_noise' + extension)
+                output_fluxs.append(continuum_noise_sigmaclip)
+
+            for output_file, output_flux in zip(output_files, output_fluxs):
+                print("  . " + output_file)
+                os.system('rm -rf ' + output_file)
+                if iname or ifile:
+                    fits.writeto(output_file, np.float32(output_flux), header=header, clobber=True)
+                if ispec:
+                    np.savetxt(output_file, output_flux)
 
     if continuum:
         
+        # Re-set the variables to individual files if --imerge is used
         if imerge:
 
-            #
-            # re-setting the varibles to the unmerged files
             tmp_path = unmerged_path
             tmp_files = unmerged_files
 
         for tmp_file in tmp_files:
 
+            # Copy the merged continuuum file to individual continuum files
+            # for each one of the files used during the merging
             if imerge:
 
-                #
-                # copy of the merged continuuum to single continuum files
-                # for each one of the files used in the merging
                 os.system('cp -rp ' + continuum_file_sigmaclip + ' ' + cont_path + tmp_file + '_continuum' + extension)
 
-            #
-            # subtraction of the continuum to the data file
-            # it produces a line-only cube and a continuum-only file
+            # Subtract continuum to the original (line+continuum) data file
+            # and produce a line-only and a continuum-only file
             if cfree is True:
 
                 print("")
                 print("... REMOVING CONTINUUM FROM DATA ... " + tmp_path + tmp_file + extension)
 
-                #
-                # defining the cube file (original file)
-                # and the continuum file
+                # Select the original line+continuum file and the created continuum file
                 cube_file = tmp_path + tmp_file + extension
                 cont_files = []
                 cont_files.append(tmp_file + '_continuum')
@@ -611,8 +498,7 @@ def process_files(iname=False,
 
                 for cont_file in cont_files:
 
-                    #
-                    # for ascii files
+                    # For ASCII files
                     if ispec:
 
                         fdata_cont = open(cont_path + cont_file + extension, 'r')
@@ -626,8 +512,7 @@ def process_files(iname=False,
 
                         print("  . " + line_outfile)
 
-                    #
-                    # for fits files
+                    # For FITS files
                     if iname or ifile:
 
                         data_cube = fits.getdata(cube_file)
@@ -635,47 +520,46 @@ def process_files(iname=False,
                         data_cont = fits.getdata(cont_path + cont_file + extension)
                         header_cont = fits.getheader(cont_path + cont_file + extension)
 
-                        #
-                        # to determine a general noise to be considered
+                        # Determine a general continuum noise to be subtracted
                         nxpix = header_cube.get('NAXIS1')
-                        rmspix = int(nxpix / 8)
-                        npixmin = 30
+                        nypix = header_cube.get('NAXIS2')
+                        rmsxpix = int(nxpix / 8)
+                        rmsypix = int(nypix / 8)
+                        nxpixmin = 30
+                        nypixmin = 30
 
-                        #
-                        # to calculate the rms noise level in four different regions
-                        # throughout the continuum fits file
-                        if nxpix > npixmin:
+                        # Calculate the rms noise level in different regions throughout the continuum FITS file
+                        if nxpix > nxpixmin and nypix > nypixmin:
                             rms = []
-                            rms.append(np.mean(data_cont[rmspix*1:rmspix*2,rmspix*1:rmspix*2]))
-                            rms.append(np.mean(data_cont[rmspix*1:rmspix*2,rmspix*2:rmspix*3]))
-                            rms.append(np.mean(data_cont[rmspix*1:rmspix*2,rmspix*5:rmspix*6]))
-                            rms.append(np.mean(data_cont[rmspix*1:rmspix*2,rmspix*6:rmspix*7]))
-                            #
-                            rms.append(np.mean(data_cont[rmspix*2:rmspix*3,rmspix*1:rmspix*2]))
-                            rms.append(np.mean(data_cont[rmspix*2:rmspix*3,rmspix*2:rmspix*3]))
-                            rms.append(np.mean(data_cont[rmspix*2:rmspix*3,rmspix*5:rmspix*6]))
-                            rms.append(np.mean(data_cont[rmspix*2:rmspix*3,rmspix*6:rmspix*7]))
-                            #
-                            rms.append(np.mean(data_cont[rmspix*5:rmspix*6,rmspix*1:rmspix*2]))
-                            rms.append(np.mean(data_cont[rmspix*5:rmspix*6,rmspix*2:rmspix*3]))
-                            rms.append(np.mean(data_cont[rmspix*5:rmspix*6,rmspix*5:rmspix*6]))
-                            rms.append(np.mean(data_cont[rmspix*5:rmspix*6,rmspix*6:rmspix*7]))
-                            #
-                            rms.append(np.mean(data_cont[rmspix*6:rmspix*7,rmspix*1:rmspix*2]))
-                            rms.append(np.mean(data_cont[rmspix*6:rmspix*7,rmspix*2:rmspix*3]))
-                            rms.append(np.mean(data_cont[rmspix*6:rmspix*7,rmspix*5:rmspix*6]))
-                            rms.append(np.mean(data_cont[rmspix*6:rmspix*7,rmspix*6:rmspix*7]))
 
-                            #print(np.median(rms))
+                            rms.append(np.mean(data_cont[rmsypix*1:rmsypix*2,rmsxpix*1:rmsxpix*2]))
+                            rms.append(np.mean(data_cont[rmsypix*1:rmsypix*2,rmsxpix*2:rmsxpix*3]))
+                            rms.append(np.mean(data_cont[rmsypix*1:rmsypix*2,rmsxpix*5:rmsxpix*6]))
+                            rms.append(np.mean(data_cont[rmsypix*1:rmsypix*2,rmsxpix*6:rmsxpix*7]))
+
+                            rms.append(np.mean(data_cont[rmsypix*2:rmsypix*3,rmsxpix*1:rmsxpix*2]))
+                            rms.append(np.mean(data_cont[rmsypix*2:rmsypix*3,rmsxpix*2:rmsxpix*3]))
+                            rms.append(np.mean(data_cont[rmsypix*2:rmsypix*3,rmsxpix*5:rmsxpix*6]))
+                            rms.append(np.mean(data_cont[rmsypix*2:rmsypix*3,rmsxpix*6:rmsxpix*7]))
+
+                            rms.append(np.mean(data_cont[rmsypix*5:rmsypix*6,rmsxpix*1:rmsxpix*2]))
+                            rms.append(np.mean(data_cont[rmsypix*5:rmsypix*6,rmsxpix*2:rmsxpix*3]))
+                            rms.append(np.mean(data_cont[rmsypix*5:rmsypix*6,rmsxpix*5:rmsxpix*6]))
+                            rms.append(np.mean(data_cont[rmsypix*5:rmsypix*6,rmsxpix*6:rmsxpix*7]))
+
+                            rms.append(np.mean(data_cont[rmsypix*6:rmsypix*7,rmsxpix*1:rmsxpix*2]))
+                            rms.append(np.mean(data_cont[rmsypix*6:rmsypix*7,rmsxpix*2:rmsxpix*3]))
+                            rms.append(np.mean(data_cont[rmsypix*6:rmsypix*7,rmsxpix*5:rmsxpix*6]))
+                            rms.append(np.mean(data_cont[rmsypix*6:rmsypix*7,rmsxpix*6:rmsxpix*7]))
+
                             data_finalcont = data_cont + np.absolute(np.median(rms))
                             data_line = data_cube - (data_cont + np.absolute(np.median(rms)))
 
-                        #
-                        # if the size of the map is too small (less than 100x100 pixels)
+                        # If the size of the map is too small (less than 30x30 pixels)
                         # no rms noise level is subtracted
                         else:
 
-                            print("  . WARNING: The image has less than %i pixels" % (npixmin))
+                            print("  . WARNING: The image has less than %i x %i pixels" % (nxpixmin, nypixmin))
                             print("  .          No residual noise level subtracted for")
                             print("  .          %s " % (cube_file))
 
@@ -691,9 +575,8 @@ def process_files(iname=False,
                         os.system('rm -rf ' + line_outfile)
                         fits.writeto(line_outfile, np.float32(data_line), header=header_cube, clobber=True)
 
-                        #
-                        # creating a line-only cube
-                        # replacing the old continuum-only image by the new one
+                        # Create a line-only cube
+                        # and replace the old continuum image with the new one
                         os.system('mv ' + cont_path + cont_file + extension + ' ' + cont_path + cont_file + '_original' + extension)
                         os.system('mv ' + cont_outfile + ' ' + cont_path + cont_file + extension)
                         os.system('mv ' + line_outfile + ' ' + cont_path + tmp_file + '_line' + extension)
@@ -702,7 +585,6 @@ def process_files(iname=False,
                         print("  . " + cont_path + tmp_file + '_noise' + extension)
                         print("  . " + cont_path + tmp_file + '_line' + extension)
 
-    #
     # combintation of several continuum files to determine the spectral index
     # it also combines them and creates a continuum model, and line+continuum model
     if spindex:
@@ -823,6 +705,83 @@ def process_files(iname=False,
         print("  . search for spindex, cont_model and line_cont_model")
         print(" ")
 
+##======================================================================
+def fits_cutout(filename, xc, yc, size, outfile):
+
+    """
+    Create a cutout of a larger FITS file
+    
+    Parameters
+    ----------
+    filename : string
+        Name of the FITS file
+    xc : float
+    yc : float
+        X and Y coordinates of the central pixel of the cutout image
+    size : float
+        Size of the cutout image in pixels
+    outfile : string
+        Name of the output FITS file
+    
+    Returns
+    -------
+    outfile : string
+        Name of the output FITS file
+    """
+
+    if isinstance(filename, str):
+        fitsfile = astropy.io.fits.open(filename)
+        opened = True
+
+    # Get header information
+    head = fitsfile[0].header.copy()
+    ndim = head.get('NAXIS')
+    cdelt1 = head.get('CDELT1')
+    cdelt2 = head.get('CDELT2')
+    nmax = head.get('NAXIS3')
+
+    if cdelt1 is None or cdelt2 is None:
+        raise Exception("Missing CD or CDELT keywords in header")
+
+    xmin, xmax = np.max([0, xc - size / 2]), np.min([head['NAXIS1'], xc + size / 2])
+    ymin, ymax = np.max([0, yc - size / 2]), np.min([head['NAXIS2'], yc + size / 2])
+
+    if xmax < 0 or ymax < 0:
+        raise ValueError("Max Coordinate is outside of map: %f, %f." % (xmax, ymax))
+
+    if ymin >= head.get('NAXIS2') or xmin >= head.get('NAXIS1'):
+        raise ValueError("Min Coordinate is outside of map: %f, %f." % (xmin, ymin))
+
+    head['CRPIX1'] -= xmin
+    head['CRPIX2'] -= ymin
+    head['NAXIS1'] = int(xmax - xmin)
+    head['NAXIS2'] = int(ymax - ymin)
+    head['NAXIS3'] = 1
+
+    if head.get('NAXIS1') == 0 or head.get('NAXIS2') == 0:
+        raise ValueError("Map has a 0 dimension: %i, %i." % (head.get('NAXIS1'), head.get('NAXIS2')))
+
+    # Copy data
+    if ndim == 4:
+        img = fitsfile[0].data[0:1, 0:nmax, ymin:ymax, xmin:xmax]
+    if ndim == 3:
+        img = fitsfile[0].data[0:nmax, ymin:ymax, xmin:xmax]
+    newfile = astropy.io.fits.PrimaryHDU(data=img, header=head)
+
+    # Output
+    if isinstance(outfile, str):
+
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+
+            newfile.writeto(outfile, clobber=True)
+
+    if opened:
+        fitsfile.close()
+
+    return newfile
+
+##======================================================================
 def i_merge(tmp_files, tmp_path, extension, merged_file_name, merged_path):
     """
     Merge files to be processed into one single output merged file
@@ -915,7 +874,7 @@ def i_merge(tmp_files, tmp_path, extension, merged_file_name, merged_path):
     
     return tmp_files, tmp_path, unmerged_files, unmerged_path
 
-
+##======================================================================
 def cont_histo(flux, rms_noise):
     """
     Create histogram distribution of the flux data
@@ -986,7 +945,7 @@ def cont_histo(flux, rms_noise):
     
     return all_bins, all_hist, sel_bins, sel_hist, sel_flux
 
-
+##======================================================================
 def c_max(flux, rms_noise):
     """
     Perform histogram distribution of variable flux, and determine
@@ -1011,6 +970,7 @@ def c_max(flux, rms_noise):
     
     return maximum_flux
 
+##======================================================================
 def c_mean(flux, rms_noise):
     """
     Perform mean of the distribution of variable flux, and determine
@@ -1039,7 +999,7 @@ def c_mean(flux, rms_noise):
     
     return mean_flux, meansel_flux
 
-
+##======================================================================
 def c_median(flux, rms_noise):
     """
     Perform median of the distribution of variable flux, and determine
@@ -1068,6 +1028,7 @@ def c_median(flux, rms_noise):
     
     return median_flux, mediansel_flux
 
+##======================================================================
 def c_percent(flux, percentile):
     """
     Perform numpy percentile to determine the level of the selected
@@ -1090,6 +1051,7 @@ def c_percent(flux, percentile):
     
     return percent_flux
 
+##======================================================================
 def c_KDEmax(flux, rms_noise):
     """
     Perform KDE of the distribution and determine the position of the
@@ -1119,6 +1081,7 @@ def c_KDEmax(flux, rms_noise):
     
     return KDEmax_flux
 
+##======================================================================
 def c_Gaussian(flux, rms_noise):
     """
     Perform Gaussian fit to the distribution of variable flux, and determine
@@ -1169,6 +1132,7 @@ def c_Gaussian(flux, rms_noise):
     
     return Gaussian_flux, Gaussian_noise, GaussNw_flux, GaussNw_noise
 
+##======================================================================
 def c_sigmaclip(flux, rms_noise, sigma_clip_threshold=1.8):
     """
     Perform sigma-clipping to determine the mean flux level, with different

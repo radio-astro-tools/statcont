@@ -488,15 +488,12 @@ def process_files(iname=False,
             if cfree is True:
 
                 print("")
-                print("... REMOVING CONTINUUM FROM DATA ... " + tmp_path + tmp_file + extension)
+                print("+++ REMOVING CONTINUUM FROM DATA ... " + tmp_path + tmp_file + extension)
 
                 # Select the original line+continuum file and the created continuum file
                 cube_file = tmp_path + tmp_file + extension
                 cont_files = []
                 cont_files.append(tmp_file + '_continuum')
-
-                print(" ")
-                print("... FILEs CREATED: ")
 
                 for cont_file in cont_files:
 
@@ -512,6 +509,8 @@ def process_files(iname=False,
                         line_outfile = line_path + cont_file + '.line' + extension
                         ascii.write((freqs, flux[:]-data_cont), output=line_outfile)
 
+                        print(" ")
+                        print("... FILEs CREATED: ")
                         print("  . " + line_outfile)
 
                     # For FITS files
@@ -525,6 +524,7 @@ def process_files(iname=False,
                         # If --nooffset is selected, try to remove the offset from the map
                         if nooffset:
                             
+                            print("... removing general continuum offset")
                             nxpix = header_cube.get('NAXIS1')
                             nypix = header_cube.get('NAXIS2')
                             rmsxpix = int(nxpix / 8)
@@ -589,6 +589,8 @@ def process_files(iname=False,
                         os.system('mv ' + cont_outfile + ' ' + cont_path + cont_file + extension)
                         os.system('mv ' + line_outfile + ' ' + cont_path + tmp_file + '_line' + extension)
 
+                        print(" ")
+                        print("... FILEs CREATED: ")
                         if nooffset:
                             print("  . " + cont_path + tmp_file + '_continuum' + extension)
                             print("  . " + cont_path + tmp_file + '_noise' + extension)

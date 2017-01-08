@@ -38,7 +38,9 @@ def process_files(iname=False,
                   cGaussian=False,
                   csigmaclip=False,
                   cfree=False,
+                  nooffset=False,
                   spindex=False,
+                  model=False,
                   plots=False,
                   cutout=False,
                   verbose=False):
@@ -520,51 +522,54 @@ def process_files(iname=False,
                         data_cont = fits.getdata(cont_path + cont_file + extension)
                         header_cont = fits.getheader(cont_path + cont_file + extension)
 
-                        # Determine a general continuum noise to be subtracted
-                        nxpix = header_cube.get('NAXIS1')
-                        nypix = header_cube.get('NAXIS2')
-                        rmsxpix = int(nxpix / 8)
-                        rmsypix = int(nypix / 8)
-                        nxpixmin = 30
-                        nypixmin = 30
-
                         # If --nooffset is selected, try to remove the offset from the map
-                        # Calculate the rms noise level in different regions throughout the continuum FITS file
-                        if nooffset is True and nxpix > nxpixmin and nypix > nypixmin:
-                            rms = []
+                        if nooffset:
+                            
+                            nxpix = header_cube.get('NAXIS1')
+                            nypix = header_cube.get('NAXIS2')
+                            rmsxpix = int(nxpix / 8)
+                            rmsypix = int(nypix / 8)
+                            nxpixmin = 1
+                            nypixmin = 1
 
-                            rms.append(np.mean(data_cont[rmsypix*1:rmsypix*2,rmsxpix*1:rmsxpix*2]))
-                            rms.append(np.mean(data_cont[rmsypix*1:rmsypix*2,rmsxpix*2:rmsxpix*3]))
-                            rms.append(np.mean(data_cont[rmsypix*1:rmsypix*2,rmsxpix*5:rmsxpix*6]))
-                            rms.append(np.mean(data_cont[rmsypix*1:rmsypix*2,rmsxpix*6:rmsxpix*7]))
+                            # Calculate the rms noise level in different regions throughout the continuum FITS file
+                            if nxpix > nxpixmin and nypix > nypixmin:
+                                rms = []
 
-                            rms.append(np.mean(data_cont[rmsypix*2:rmsypix*3,rmsxpix*1:rmsxpix*2]))
-                            rms.append(np.mean(data_cont[rmsypix*2:rmsypix*3,rmsxpix*2:rmsxpix*3]))
-                            rms.append(np.mean(data_cont[rmsypix*2:rmsypix*3,rmsxpix*5:rmsxpix*6]))
-                            rms.append(np.mean(data_cont[rmsypix*2:rmsypix*3,rmsxpix*6:rmsxpix*7]))
+                                rms.append(np.mean(data_cont[rmsypix*1:rmsypix*2,rmsxpix*1:rmsxpix*2]))
+                                rms.append(np.mean(data_cont[rmsypix*1:rmsypix*2,rmsxpix*2:rmsxpix*3]))
+                                rms.append(np.mean(data_cont[rmsypix*1:rmsypix*2,rmsxpix*5:rmsxpix*6]))
+                                rms.append(np.mean(data_cont[rmsypix*1:rmsypix*2,rmsxpix*6:rmsxpix*7]))
 
-                            rms.append(np.mean(data_cont[rmsypix*5:rmsypix*6,rmsxpix*1:rmsxpix*2]))
-                            rms.append(np.mean(data_cont[rmsypix*5:rmsypix*6,rmsxpix*2:rmsxpix*3]))
-                            rms.append(np.mean(data_cont[rmsypix*5:rmsypix*6,rmsxpix*5:rmsxpix*6]))
-                            rms.append(np.mean(data_cont[rmsypix*5:rmsypix*6,rmsxpix*6:rmsxpix*7]))
+                                rms.append(np.mean(data_cont[rmsypix*2:rmsypix*3,rmsxpix*1:rmsxpix*2]))
+                                rms.append(np.mean(data_cont[rmsypix*2:rmsypix*3,rmsxpix*2:rmsxpix*3]))
+                                rms.append(np.mean(data_cont[rmsypix*2:rmsypix*3,rmsxpix*5:rmsxpix*6]))
+                                rms.append(np.mean(data_cont[rmsypix*2:rmsypix*3,rmsxpix*6:rmsxpix*7]))
 
-                            rms.append(np.mean(data_cont[rmsypix*6:rmsypix*7,rmsxpix*1:rmsxpix*2]))
-                            rms.append(np.mean(data_cont[rmsypix*6:rmsypix*7,rmsxpix*2:rmsxpix*3]))
-                            rms.append(np.mean(data_cont[rmsypix*6:rmsypix*7,rmsxpix*5:rmsxpix*6]))
-                            rms.append(np.mean(data_cont[rmsypix*6:rmsypix*7,rmsxpix*6:rmsxpix*7]))
+                                rms.append(np.mean(data_cont[rmsypix*5:rmsypix*6,rmsxpix*1:rmsxpix*2]))
+                                rms.append(np.mean(data_cont[rmsypix*5:rmsypix*6,rmsxpix*2:rmsxpix*3]))
+                                rms.append(np.mean(data_cont[rmsypix*5:rmsypix*6,rmsxpix*5:rmsxpix*6]))
+                                rms.append(np.mean(data_cont[rmsypix*5:rmsypix*6,rmsxpix*6:rmsxpix*7]))
 
-                            data_finalcont = data_cont + np.absolute(np.median(rms))
-                            data_line = data_cube - (data_cont + np.absolute(np.median(rms)))
+                                rms.append(np.mean(data_cont[rmsypix*6:rmsypix*7,rmsxpix*1:rmsxpix*2]))
+                                rms.append(np.mean(data_cont[rmsypix*6:rmsypix*7,rmsxpix*2:rmsxpix*3]))
+                                rms.append(np.mean(data_cont[rmsypix*6:rmsypix*7,rmsxpix*5:rmsxpix*6]))
+                                rms.append(np.mean(data_cont[rmsypix*6:rmsypix*7,rmsxpix*6:rmsxpix*7]))
 
-                        # If the size of the map is too small (less than 30x30 pixels)
-                        # no rms noise level is subtracted
-                        else:
+                                data_finalcont = data_cont + np.absolute(np.median(rms))
+                                data_line = data_cube - (data_cont + np.absolute(np.median(rms)))
 
-                            if nooffset is True:
+                            # If the size of the map is too small (less than 30x30 pixels)
+                            # no rms noise level is subtracted
+                            else:
                                 print("  . WARNING: The image has less than %i x %i pixels" % (nxpixmin, nypixmin))
                                 print("  .          No residual noise level subtracted for")
                                 print("  .          %s " % (cube_file))
+                                
+                                data_finalcont = data_cont
+                                data_line = data_cube - data_cont
 
+                        else:
                             data_finalcont = data_cont
                             data_line = data_cube - data_cont
 
@@ -579,12 +584,12 @@ def process_files(iname=False,
 
                         # Create a line-only cube
                         # and replace the old continuum image with the new one
-                        if nooffset is True:
+                        if nooffset:
                             os.system('mv ' + cont_path + cont_file + extension + ' ' + cont_path + cont_file + '_original' + extension)
                         os.system('mv ' + cont_outfile + ' ' + cont_path + cont_file + extension)
                         os.system('mv ' + line_outfile + ' ' + cont_path + tmp_file + '_line' + extension)
 
-                        if nooffset is True:
+                        if nooffset:
                             print("  . " + cont_path + tmp_file + '_continuum' + extension)
                             print("  . " + cont_path + tmp_file + '_noise' + extension)
                         print("  . " + cont_path + tmp_file + '_line' + extension)

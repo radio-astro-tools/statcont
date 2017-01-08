@@ -528,8 +528,9 @@ def process_files(iname=False,
                         nxpixmin = 30
                         nypixmin = 30
 
+                        # If --nooffset is selected, try to remove the offset from the map
                         # Calculate the rms noise level in different regions throughout the continuum FITS file
-                        if nxpix > nxpixmin and nypix > nypixmin:
+                        if nooffset is True and nxpix > nxpixmin and nypix > nypixmin:
                             rms = []
 
                             rms.append(np.mean(data_cont[rmsypix*1:rmsypix*2,rmsxpix*1:rmsxpix*2]))
@@ -559,9 +560,10 @@ def process_files(iname=False,
                         # no rms noise level is subtracted
                         else:
 
-                            print("  . WARNING: The image has less than %i x %i pixels" % (nxpixmin, nypixmin))
-                            print("  .          No residual noise level subtracted for")
-                            print("  .          %s " % (cube_file))
+                            if nooffset is True:
+                                print("  . WARNING: The image has less than %i x %i pixels" % (nxpixmin, nypixmin))
+                                print("  .          No residual noise level subtracted for")
+                                print("  .          %s " % (cube_file))
 
                             data_finalcont = data_cont
                             data_line = data_cube - data_cont
@@ -577,12 +579,14 @@ def process_files(iname=False,
 
                         # Create a line-only cube
                         # and replace the old continuum image with the new one
-                        os.system('mv ' + cont_path + cont_file + extension + ' ' + cont_path + cont_file + '_original' + extension)
+                        if nooffset is True:
+                            os.system('mv ' + cont_path + cont_file + extension + ' ' + cont_path + cont_file + '_original' + extension)
                         os.system('mv ' + cont_outfile + ' ' + cont_path + cont_file + extension)
                         os.system('mv ' + line_outfile + ' ' + cont_path + tmp_file + '_line' + extension)
 
-                        print("  . " + cont_path + tmp_file + '_continuum' + extension)
-                        print("  . " + cont_path + tmp_file + '_noise' + extension)
+                        if nooffset is True:
+                            print("  . " + cont_path + tmp_file + '_continuum' + extension)
+                            print("  . " + cont_path + tmp_file + '_noise' + extension)
                         print("  . " + cont_path + tmp_file + '_line' + extension)
 
     # Combine several continuum files to determine the spectral index

@@ -55,6 +55,8 @@ def main(args=None):
                       help='OPTIONAL: Continuum using ALL the methods')
     pars.add_argument('--cfree', action='store_true',
                       help='OPTIONAL: Remove the continuum to the original datacube')
+    pars.add_argument('--nooffset', action='store_true',
+                      help='OPTIONAL: Search for and remove a general continuum offset')
     pars.add_argument('--spindex', action='store_true',
                       help='OPTIONAL: Determine the spectral index (ALPHA), as \
                             a linear function: Flux = FACTOR * frequency ^ (ALPHA) \
@@ -99,6 +101,10 @@ def main(args=None):
     # Activate the main code for continuum determination when using any method
     if op.cmax or op.cmean or op.cmedian or op.cpercent or op.cKDEmax or op.cGaussian or op.csigmaclip:
         op.continuum = True
+
+    # Activate the subtraction of the continuum --cfree, if the general offset wants to be removed
+    if op.nooffset:
+        op.cfree = True
 
     # Activate the determination of the spectral index --spindex, if the model wants to be created
     if op.model:

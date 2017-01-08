@@ -60,6 +60,9 @@ def main(args=None):
                             a linear function: Flux = FACTOR * frequency ^ (ALPHA) \
                             Provide a list of files to be processed, for which \
                             the continuum needs to be created (--continuum)')
+    pars.add_argument('--model', action='store_true',
+                      help='OPTIONAL: Create a continuum model using information \
+                            from --spindex, and a line+continuum(model) cube')
     pars.add_argument('--cutout', nargs=3, type=int,
                       help='OPTIONAL: Create a cutout image of the original file. \
                             Three integer numbers are required for this option: \
@@ -97,6 +100,10 @@ def main(args=None):
     if op.cmax or op.cmean or op.cmedian or op.cpercent or op.cKDEmax or op.cGaussian or op.csigmaclip:
         op.continuum = True
 
+    # Activate the determination of the spectral index --spindex, if the model wants to be created
+    if op.model:
+        op.spindex = True
+    
     # Noise level of your data cubes (in units of the FITS file)
     rms_noise = op.noise[0]
 

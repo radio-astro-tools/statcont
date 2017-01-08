@@ -585,15 +585,14 @@ def process_files(iname=False,
                         print("  . " + cont_path + tmp_file + '_noise' + extension)
                         print("  . " + cont_path + tmp_file + '_line' + extension)
 
-    # combintation of several continuum files to determine the spectral index
+    # Combine several continuum files to determine the spectral index
     # it also combines them and creates a continuum model, and line+continuum model
     if spindex:
 
         print(" ")
         print("+++ DETERMINING SPECTRAL INDEX (CONTINUUM MODEL) ...")
 
-        #
-        # to combine all the continuum images in one single cube
+        # Combine all the continuum images in one single cube
         my_frequency = []
         my_cube = np.empty([len(tmp_files),nypix,nxpix])
         icount = 0
@@ -606,13 +605,11 @@ def process_files(iname=False,
             my_cube[icount,:,:] = contcube_data
             icount = icount+1
 
-        #
-        # applying a blanking value of 1.e-10
+        # Apply blanking value of 1.e-10
         my_cube[my_cube<1.e-10] = 1.e-10
         my_frequency = np.array(my_frequency)
 
-        #
-        # to fit all the continuum images and determine the spectral index (m)
+        # Fit all the continuum images and determine the spectral index (m)
         # following expression:  flux = A x frequency ^ spindex
         # and in logarithmic version:  log(flux) = log(A) + spindex * log(frequency)
         m = []
@@ -642,68 +639,62 @@ def process_files(iname=False,
         os.system('rm -rf ' + cont_n_file)
         fits.writeto(cont_n_file, np.float32(n), header=header, clobber=True)
 
-        #
-        # reading the spectral index (m) and the intercept (n)
-        m_data = fits.getdata(cont_m_file)
-        n_data = fits.getdata(cont_n_file)
-
-        #
-        # to create a continuum model (from the spectral index)
+        # Create a continuum model (from the spectral index)
         # and a line+continuum cube, using the continuum model
-        for tmp_file in tmp_files:
+        if model:
+        
+            # reading the spectral index (m) and the intercept (n)
+            m_data = fits.getdata(cont_m_file)
+            n_data = fits.getdata(cont_n_file)
 
-            #
-            # to create a frequency array from the original data cube
-            cube_data =  fits.getdata(tmp_path + tmp_file + extension)
-            cube_header = fits.getheader(tmp_path + tmp_file + extension)
-            frequency_array = []
+            for tmp_file in tmp_files:
 
-            for i in range(cube_header['NAXIS3']):
+                # Create a frequency array from the original data cube
+                cube_data =  fits.getdata(tmp_path + tmp_file + extension)
+                cube_header = fits.getheader(tmp_path + tmp_file + extension)
+                frequency_array = []
 
-                frequency_array.append(cube_header['CRVAL3'] + (i - cube_header['CRPIX3'])*cube_header['CDELT3'])
+                for i in range(cube_header['NAXIS3']):
 
-            frequency_array = np.array(frequency_array)
+                    frequency_array.append(cube_header['CRVAL3'] + (i - cube_header['CRPIX3'])*cube_header['CDELT3'])
 
-            #
-            # to read the continuum real emission (determined in --continuum mode)
-            cont_real = fits.getdata(cont_path + tmp_file + '_continuum.fits')
+                frequency_array = np.array(frequency_array)
 
-            #
-            # to generate the continuum model (using the n, m parameters)
-            print("... creating continuum model of " + tmp_file)
-            cont_model = np.power(10, n_data[np.newaxis, :, :] + (np.log10(frequency_array[:,np.newaxis, np.newaxis]) * m_data[np.newaxis, :, :]))
-            cont_model_file = cont_path + tmp_file + '_cont_model' + extension
-            os.system('rm -rf ' + cont_model_file)
-            fits.writeto(cont_model_file, np.float32(cont_model), header=cube_header, clobber=True)
+                # Read the continuum real emission (from --continuum)
+                cont_real = fits.getdata(cont_path + tmp_file + '_continuum.fits')
 
-            #
-            # to compute the factor between real and model continuum
-            factor = cont_model[:, :, :] / cont_real[np.newaxis, :, :]
-            factor[cont_real < (rms_noise*1.0e-3)] = 1.0
-            factor_file = cont_path + tmp_file + '_cont_factor' + extension
-            os.system('rm -rf ' + factor_file)
-            fits.writeto(factor_file, np.float32(factor), header=cube_header, clobber=True)
+                # Generate the continuum model (using the n, m parameters)
+                print("... creating continuum model of " + tmp_file)
+                cont_model = np.power(10, n_data[np.newaxis, :, :] + (np.log10(frequency_array[:,np.newaxis, np.newaxis]) * m_data[np.newaxis, :, :]))
+                cont_model_file = cont_path + tmp_file + '_cont_model' + extension
+                os.system('rm -rf ' + cont_model_file)
+                fits.writeto(cont_model_file, np.float32(cont_model), header=cube_header, clobber=True)
 
-            #
-            # to compute the line and continuum model
-            print("... creating the line+continuum model of " + tmp_file)
-            line_cont_model = cube_data[:, :, :, :] * factor[np.newaxis, :, :, :]
-            line_cont_model_file = cont_path + tmp_file + '_line_cont_model' + extension
-            os.system('rm -rf ' + line_cont_model_file)
-            fits.writeto(line_cont_model_file, np.float32(line_cont_model), header=cube_header, clobber=True)
+                # Compute the factor between real and model continuum
+                factor = cont_model[:, :, :] / cont_real[np.newaxis, :, :]
+                factor[cont_real < (rms_noise*1.0e-3)] = 1.0
+                factor_file = cont_path + tmp_file + '_cont_factor' + extension
+                os.system('rm -rf ' + factor_file)
+                fits.writeto(factor_file, np.float32(factor), header=cube_header, clobber=True)
 
-            #
-            # line only model data
-            line_model = line_cont_model - cont_model
-            line_model_file = cont_path + tmp_file + '_line_model' + extension
-            os.system('rm -rf ' + line_model_file)
-            fits.writeto(line_model_file, np.float32(line_model), header=cube_header, clobber=True)
+                # Compute the line and continuum model
+                print("... creating the line+continuum model of " + tmp_file)
+                line_cont_model = cube_data[:, :, :, :] * factor[np.newaxis, :, :, :]
+                line_cont_model_file = cont_path + tmp_file + '_line_cont_model' + extension
+                os.system('rm -rf ' + line_cont_model_file)
+                fits.writeto(line_cont_model_file, np.float32(line_cont_model), header=cube_header, clobber=True)
 
-        #
-        # to indicate where the created files can be found
+                # Compute the line only model data
+                line_model = line_cont_model - cont_model
+                line_model_file = cont_path + tmp_file + '_line_model' + extension
+                os.system('rm -rf ' + line_model_file)
+                fits.writeto(line_model_file, np.float32(line_model), header=cube_header, clobber=True)
+
+        # Indicate where the created files can be found
         print("... FILEs CREATED are found in " + cont_path)
         print("  . search for spindex, cont_model and line_cont_model")
         print(" ")
+
 
 ##======================================================================
 def fits_cutout(filename, xc, yc, size, outfile):

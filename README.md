@@ -1,5 +1,6 @@
-SUBCONT - continuum subtraction for line-rich data
---------------------------------------------------
+STATCONT - A statistical continuum level determination method
+           for line-rich sources
+--------------------------------------------------------------
 
-todo
+Description in progress.
 

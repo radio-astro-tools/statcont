@@ -1,6 +1,5 @@
-STATCONT - A statistical continuum level determination method
-           for line-rich sources
---------------------------------------------------------------
+STATCONT - A statistical continuum level determination method for line-rich sources
+-----------------------------------------------------------------------------------
 
 STATCONT is a python-based tool designed to determine the continuum 
 emission level in line-rich spectral data. The tool inspects the 
@@ -21,10 +20,10 @@ line emission, i.e. continuum-subtracted data cubes. STATCONT also
 includes the option to estimate the spectral index or variation of the 
 continuum emission with frequency.
 
-​If you find STATCONT useful, please cite/refer to:
+If you find STATCONT useful, please cite/refer to:
 Sanchez-Monge, Schilke, Ginsburg, Cesaroni and Schmiedeke 2017, A&A, submitted
 
-​
+
 ------------------------------------
 Download / Installation instructions
 ------------------------------------
@@ -38,57 +37,68 @@ You can directly install STATCONT by typing in a terminal session in
 your computer (you may need sudo permissions depending on the 
 configuration of your system):
 
-$ pip install https://github.com/radio-astro-tools/statcont/archive/master.zip
+```
+pip install https://github.com/radio-astro-tools/statcont/archive/master.zip
+```
 
 If you are a GitHub user, you can clone STATCONT in your computer. 
 Create a directory and move there, then type:
 
-$ git init
-$ git clone https://github.com/radio-astro-tools/statcont
-$ cd statcont
-$ python setup.py install
+```
+git init
+git clone https://github.com/radio-astro-tools/statcont
+cd statcont
+python setup.py install
+```
 
 Alternatively, STATCONT can also be downloaded locally as a file 
 STATCONT.tar.gz from: http://www.astro.uni-koeln.de/~sanchez/statcont
 In order to install it, download the file to a directory in your computer:
 
-$ gunzip STATCONT.tar.gz
-$ tar -xvf STATCONT.tar
-$ cd statcont
-$ python setup.py install
+```
+gunzip STATCONT.tar.gz
+tar -xvf STATCONT.tar
+cd statcont
+python setup.py install
+```
 
 Following the installation, you have immediate access to STATCONT in 
 your computer by typing "statcont" in a terminal session. For example, 
 inspect the help by doing:
 
-$ statcont --help
+```
+statcont --help
+```
 
-
-​---------------------
+---------------------
 Examples / Test cases
-​---------------------
+---------------------
 
 In the following we explain how to execute the main tasks of STATCONT. 
 A set of test cases is provided in this test_cases.tar.gz file. 
 Download the file to your computer and follow these instructions:
 
-$ gunzip test_cases.tar.gz
-$ tar -xvf test_cases.tar
+```
+gunzip test_cases.tar.gz
+tar -xvf test_cases.tar
+```
 
 This creates a directory called data that contains two other 
-subdirectories SPEC_TESTS and MAP_TESTS
+subdirectories `SPEC_TESTS` and `MAP_TESTS`
 
 STATCONT requires of a directory data where the files to be processed 
 are saved. By executing STATCONT, another directory called products 
 will be generated. The files to be processed, can be directly saved in 
 data or in subdirectories. In the examples provided here, we have a set 
-of single-spectrum saved in SPEC_TESTS and FITS cubes in MAP_TESTS.
+of single-spectrum saved in `SPEC_TESTS` and FITS cubes in `MAP_TESTS`.
 
 
 Determining the continuum in single spectrum files (ASCII files)
-​---------------------​---------------------​----------------------
+----------------------------------------------------------------
 
-  $ statcont -p SPEC_TESTS -s my_emission -n 1
+```
+   statcont -p SPEC_TESTS -s my_emission -n 1
+```
 
   - The option -p indicates the subdirectory in data that contains
     the file to be analyzed
@@ -99,7 +109,9 @@ Determining the continuum in single spectrum files (ASCII files)
 
 If you want to determine the continuum level:
 
-  $ statcont -p SPEC_TESTS -s my_emission -n 1 --continuum
+```
+   statcont -p SPEC_TESTS -s my_emission -n 1 --continuum
+```
 
   - The option --continuum makes use of the 'corrected sigma-clipping 
     algorithm' described in Sanchez-Monge et al (2017), to determine
@@ -111,28 +123,36 @@ Using different methods to determine the continuum level. STATCONT
 contains a set of different statistical methods that can be used by the 
 user at his/her convenience. You can select all them like this:
 
-  $ statcont -p SPEC_TESTS -s my_emission -n 1 --call
+```
+   statcont -p SPEC_TESTS -s my_emission -n 1 --call
+```
 
 Or you can select individual methods like:
 
-  $ statcont -p SPEC_TESTS -s my_emission -n 1 --cmax
-  $ statcont -p SPEC_TESTS -s my_emission -n 1 --cmean
-  $ statcont -p SPEC_TESTS -s my_emission -n 1 --cmedian
-  $ statcont -p SPEC_TESTS -s my_emission -n 1 --cpercent
-  $ statcont -p SPEC_TESTS -s my_emission -n 1 --cGaussian
-  $ statcont -p SPEC_TESTS -s my_emission -n 1 --cKDEmax
-  $ statcont -p SPEC_TESTS -s my_emission -n 1 --csigmaclip
+```
+   statcont -p SPEC_TESTS -s my_emission -n 1 --cmax
+   statcont -p SPEC_TESTS -s my_emission -n 1 --cmean
+   statcont -p SPEC_TESTS -s my_emission -n 1 --cmedian
+   statcont -p SPEC_TESTS -s my_emission -n 1 --cpercent
+   statcont -p SPEC_TESTS -s my_emission -n 1 --cGaussian
+   statcont -p SPEC_TESTS -s my_emission -n 1 --cKDEmax
+   statcont -p SPEC_TESTS -s my_emission -n 1 --csigmaclip
+```
 
 You can call several methods at once:
 
-  $ statcont -p SPEC_TESTS -s my_emission -n 1 --cmax --cGaussian --csigmaclip
+```
+   statcont -p SPEC_TESTS -s my_emission -n 1 --cmax --cGaussian --csigmaclip
+```
 
 The different methods are explained in Sanchez-Monge et al (2017)
 
 If you want to remove the continuum from the original spectrum, in 
 order to produce a line-only data file, you can use:
 
-  $ statcont -p SPEC_TESTS - s my_emission -n 1 --csigmaclip --cfree
+```
+   statcont -p SPEC_TESTS - s my_emission -n 1 --csigmaclip --cfree
+```
 
   - The option --cfree uses the 'corrected sigma-clipping algorithm'
     to determine the continuum, and removes it from the original
@@ -140,32 +160,42 @@ order to produce a line-only data file, you can use:
 
 You can use other example files, like for example:
 
-  $ statcont -p SPEC_TESTS -s my_absorption -n 1 --continuum
+```
+   statcont -p SPEC_TESTS -s my_absorption -n 1 --continuum
+```
 
 And you can select multiple files simultaneously, as long as they are 
 saved in the same subdirectory, and they are considered to have the 
 same rms noise level (option -n ):
 
-  $ statcont -p SPEC_TESTS -s my_emission my_absorption my_broad-lines -n 1 --continuum
+```
+   statcont -p SPEC_TESTS -s my_emission my_absorption my_broad-lines -n 1 --continuum
+```
 
 The products can be found in products/SPEC_TESTS
 You can produce plots of the spectrum analyzed with the continuum 
 levels by using the option --plots. As an example:
 
-  $ statcont -p SPEC_TESTS -s my_emission -n 1 --continuum --plots
+```
+   statcont -p SPEC_TESTS -s my_emission -n 1 --continuum --plots
+```
 
 In this case the plot is saved in products/SPEC_TESTS/plots/my_emission_1_1.png
 You can use all the continuum methods and plot them all together, like:
 
-  $ statcont -p SPEC_TESTS -s my_emission -n 1 --call --plots
+```
+   statcont -p SPEC_TESTS -s my_emission -n 1 --call --plots
+```
 
 Have a look now at the plot products/SPEC_TESTS/plots/my_emission_1_1.png
 
 
 Determining the continuum in a 3D cube file (FITS files)
-​---------------------​---------------------​--------------
+--------------------------------------------------------
 
-  $ statcont -p MAP_TESTS -i SYNTHETIC_cube -n 1
+```
+   statcont -p MAP_TESTS -i SYNTHETIC_cube -n 1
+```
 
   - The option -p indicates the subdirectory in data that contains
     the file to be analyzed
@@ -176,7 +206,9 @@ Determining the continuum in a 3D cube file (FITS files)
 
 If you want to determine the continuum level:
 
-  $ statcont -p MAP_TESTS -i SYNTHETIC_cube -n 1 --continuum
+```
+   statcont -p MAP_TESTS -i SYNTHETIC_cube -n 1 --continuum
+```
 
 This process analyzes each individual pixel, determining the continuum 
 level, and then combines all the pixels to produce a continuum FITS 
@@ -193,7 +225,9 @@ creation of plots).
 If your original FITS file is too large and you just want to determine 
 the continuum level of a small portion you can indicate it like this:
 
-  $ statcont -p MAP_TESTS -i SYNTHETIC_cube -n 1 --continuum --cutout 25 25 6
+```
+   statcont -p MAP_TESTS -i SYNTHETIC_cube -n 1 --continuum --cutout 25 25 6
+```
 
   - The --cutout option allows to select a central pixel (in this case
     25, 25) and the number of pixels in each direction of the final
@@ -205,7 +239,7 @@ the option --spindex to determine, first, the continuum level of every
 single file, and then the spectral index, i.e. the variation of the 
 continuum emission with frequency.
 
-​
+
 -----------------------------------
 Publications making use of STATCONT
 -----------------------------------

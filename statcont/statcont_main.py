@@ -456,7 +456,9 @@ def process_files(iname=False,
                 if iname or ifile:
                     fits.writeto(output_file, np.float32(output_flux), header=header, clobber=True)
                 if ispec:
-                    np.savetxt(output_file, output_flux)
+                    output_array = [np.median(freq)]
+                    output_array.append(output_flux[0][0])
+                    np.savetxt(output_file, output_array, newline=" ")
 
     if continuum:
         
@@ -500,7 +502,7 @@ def process_files(iname=False,
 
                         for line in fdata_cont:
 
-                            data_cont = float(line.strip())
+                            data_cont = float(line.split()[1])
 
                         line_outfile = line_path + cont_file + '.line' + extension
                         ascii.write((freqs, flux[:]-data_cont), output=line_outfile)
@@ -600,11 +602,12 @@ def process_files(iname=False,
     if spindex:
 
         print(" ")
-        print("+++ DETERMINING SPECTRAL INDEX (CONTINUUM MODEL) ...")
+        print("+++ DETERMINING SPECTRAL INDEX ...")
 
         # Combine all the continuum images in one single cube
         if extension=='.dat':
-            print ("HOLAA")
+            # Prepare ASCII file to combine all the continuum files 
+            tmp_merged_continuum_file = open(cont_path + 'tmp_merged_continuum' + extension, "w")
         
         if extension=='.fits':
             my_frequency = []
@@ -614,17 +617,44 @@ def process_files(iname=False,
         for tmp_file in tmp_files:
 
             if extension=='.dat':
-                print ("ADIOS")
-            
+                # merge all continuum files in one single one
+                f = open(cont_path + tmp_file + '_continuum' + extension)
+                tmp_merged_continuum_file.write("%s\n" % f.readline())
+                
             if extension=='.fits':
                 contcube_data = fits.getdata(cont_path + tmp_file + '_continuum' + extension)
                 contcube_header = fits.getheader(cont_path + tmp_file + '_continuum' + extension)
                 my_frequency.append(contcube_header.get('RESTFRQ'))
                 my_cube[icount,:,:] = contcube_data
                 icount = icount+1
+        
+        tmp_merged_continuum_file.close()
 
         if extension=='.dat':
-            print ("TRY AGAIN")
+            tmpcontfile = open(cont_path + 'tmp_merged_continuum' + extension)
+            lmy_frequency = []
+            lmy_continuum = []
+            for line in tmpcontfile:
+                lmy_frequency.append(float(line.split()[0]))
+                lmy_continuum.append(float(line.split()[1]))
+            my_frequency = np.array(lmy_frequency)
+            my_continuum = np.array(lmy_continuum)
+            my_continuum[my_continuum<1.e-10] = 1.e-10
+            y = np.log10(my_continuum)
+            x = np.log10(my_frequency)
+            z = np.polyfit(x, y, 1)
+            m = z[0]
+            n = z[1]
+            
+            cont_m_file = cont_path + source + '_spindex.dat'
+            cont_n_file = cont_path + source + '_intercept.dat'
+            
+            os.system('rm -rf ' + cont_m_file)
+            out_file = open(cont_m_file, "w")
+            out_file.write(str(m))
+            os.system('rm -rf ' + cont_n_file)
+            out_file = open(cont_n_file, "w")
+            out_file.write(str(n))
         
         if extension=='.fits':
             # Apply blanking value of 1.e-10
@@ -661,9 +691,17 @@ def process_files(iname=False,
             os.system('rm -rf ' + cont_n_file)
             fits.writeto(cont_n_file, np.float32(n), header=header, clobber=True)
 
+        # Indicate where the created files can be found
+        print("... FILEs CREATED are found in " + cont_path)
+        print("  . search for spindex and intercept")
+        print(" ")
+
         # Create a continuum model (from the spectral index)
         # and a line+continuum cube, using the continuum model
         if model:
+
+            print(" ")
+            print("+++ PRODUCING MODEL USING THE SPECTRAL INDEX ...")
         
             # reading the spectral index (m) and the intercept (n)
             m_data = fits.getdata(cont_m_file)
@@ -712,7 +750,7 @@ def process_files(iname=False,
                 os.system('rm -rf ' + line_model_file)
                 fits.writeto(line_model_file, np.float32(line_model), header=cube_header, clobber=True)
 
-        # Indicate where the created files can be found
-        print("... FILEs CREATED are found in " + cont_path)
-        print("  . search for spindex, cont_model and line_cont_model")
-        print(" ")
+            # Indicate where the created files can be found
+            print("... FILEs CREATED are found in " + cont_path)
+            print("  . search for cont_model and line_cont_model")
+            print(" ")

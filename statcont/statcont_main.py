@@ -627,10 +627,9 @@ def process_files(iname=False,
                 my_frequency.append(contcube_header.get('RESTFRQ'))
                 my_cube[icount,:,:] = contcube_data
                 icount = icount+1
-        
-        tmp_merged_continuum_file.close()
 
         if extension=='.dat':
+            tmp_merged_continuum_file.close()
             tmpcontfile = open(cont_path + 'tmp_merged_continuum' + extension)
             lmy_frequency = []
             lmy_continuum = []

@@ -87,7 +87,7 @@ def main(args=None):
                             Spectrum with continuum (and noise) levels indicated \
                             (computing time increases considerably)')
     pars.add_argument('--verbose', action='store_true',
-                      help='OPTIONAL: Increase output verbosity')
+                      help='TEST: Increase output verbosity')
     op = pars.parse_args(args)
 
     # Select all continuum determination methods when --call is used

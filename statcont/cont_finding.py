@@ -209,10 +209,14 @@ def c_sigmaclip(flux, rms_noise, sigma_clip_threshold=1.8):
 
     Returns
     -------
+    sigmaclip_flux_prev : float
     sigmaclip_flux : float
     sigmaclip_noise : float
         The measured continuum flux and estimated 1-sigma per-channel noise
         around that measurement
+        The variable sigmaclip_flux_prev contains the continuum determined
+        with the sigma-clipping method without applying the correction
+        of STATCONT
     """
 
     # Sigma-clipping method applied to the flux array
@@ -225,15 +229,54 @@ def c_sigmaclip(flux, rms_noise, sigma_clip_threshold=1.8):
     sigmaclip_flux_prev = sigmaclip_flux = np.mean(filtered_data)
     sigmaclip_noise = sigmaclip_sigma = np.std(filtered_data)
     mean_flux = np.mean(flux)
+    
+    # Determining the numbers of channels above and under the continuum level
+    # i.e. how many channels are in emission/absorption with respect to the total
+    # For betaversion
+    emission_v1 = 0
+    absorption_v1 = 0
+    emission_v1 = sum(i > (50.0+1*rms_noise) for i in flux)
+    emission_v1 = 100*emission_v1/len(flux)
+    absorption_v1 = sum(i < (50.0-1*rms_noise) for i in flux)
+    absorption_v1 = 100*absorption_v1/len(flux)
+    #
+    # For correction to the sigma-clipping continuum level
+    emission_v2 = 0
+    absorption_v2 = 0
+    emission_v2 = sum(i > (sigmaclip_flux+1*rms_noise) for i in flux)
+    emission_v2 = 100*emission_v2/len(flux)
+    absorption_v2 = sum(i < (sigmaclip_flux-1*rms_noise) for i in flux)
+    absorption_v2 = 100*absorption_v2/len(flux)
 
-    # For EMISSION-dominated spectra
-    if (mean_flux-sigmaclip_flux_prev) > (+1.0*rms_noise):
-        sigmaclip_flux = sigmaclip_flux_prev - sigmaclip_sigma
-    # For ABSORPTION-dominated spectra
-    elif (mean_flux-sigmaclip_flux_prev) < (-1.0*rms_noise):
-        sigmaclip_flux = sigmaclip_flux_prev + sigmaclip_sigma
+    # Applying corrections to the sigma-clipping continuum level
+    # 
+    if (emission_v2 < 33 and absorption_v2 < 33):
+        sigmaclip_flux = sigmaclip_flux_prev
+    elif (emission_v2 >= 33 and absorption_v2 < 33):
+        if (emission_v2-absorption_v2 > 25):
+            sigmaclip_flux = sigmaclip_flux_prev - 1.0*sigmaclip_sigma
+        if (emission_v2-absorption_v2 <= 25):
+            sigmaclip_flux = sigmaclip_flux_prev - 0.5*sigmaclip_sigma
+    elif (emission_v2 < 33 and absorption_v2 >= 33):
+        if (absorption_v2-emission_v2 > 25):
+            sigmaclip_flux = sigmaclip_flux_prev + 1.0*sigmaclip_sigma
+        if (absorption_v2-emission_v2 <= 25):
+            sigmaclip_flux = sigmaclip_flux_prev + 0.5*sigmaclip_sigma
+    elif (emission_v2 >= 33 and absorption_v2 >= 33):
+        if (emission_v2-absorption_v2 > 25):
+            sigmaclip_flux = sigmaclip_flux_prev - 1.0*sigmaclip_sigma
+        if (absorption_v2-emission_v2 > 25):
+            sigmaclip_flux = sigmaclip_flux_prev + 1.0*sigmaclip_sigma
+        if (abs(absorption_v2-emission_v2) <= 25):
+            sigmaclip_flux = sigmaclip_flux_prev
+    ## For EMISSION-dominated spectra
+    #if (mean_flux-sigmaclip_flux_prev) > (+1.0*rms_noise):
+    #    sigmaclip_flux = sigmaclip_flux_prev - sigmaclip_sigma
+    ## For ABSORPTION-dominated spectra
+    #elif (mean_flux-sigmaclip_flux_prev) < (-1.0*rms_noise):
+    #    sigmaclip_flux = sigmaclip_flux_prev + sigmaclip_sigma
 
-    return sigmaclip_flux, sigmaclip_noise
+    return sigmaclip_flux_prev, sigmaclip_flux, sigmaclip_noise, emission_v1, emission_v2, absorption_v1, absorption_v2
 
 ##======================================================================
 def cont_histo(flux, rms_noise):

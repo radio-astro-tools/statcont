@@ -4,6 +4,7 @@ from .fits_utils import *
 from .cont_finding import *
 
 import os
+import math
 #import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import gridspec
@@ -34,7 +35,8 @@ def process_files(iname=False,
                   model=False,
                   plots=False,
                   cutout=False,
-                  verbose=False):
+                  verbose=False,
+                  betaversion=False):
 
     # Read name of files to be processed
     # - for FITS file (extension if .fits)
@@ -122,11 +124,15 @@ def process_files(iname=False,
 
         tmp_files, tmp_path, unmerged_files, unmerged_path = fits_merge(tmp_files, tmp_path, extension, merged_file_name, merged_path)
 
+    if betaversion:
+        verbose = False
+        
     # Loop through all the files that will be processed
     for tmp_file in tmp_files:
 
-        print("")
-        print("+++ PROCESSING " + tmp_path + tmp_file + extension)
+        if betaversion is False:
+            print("")
+            print("+++ PROCESSING " + tmp_path + tmp_file + extension)
 
         # Read data and header of the FITS file
         if iname or ifile:
@@ -174,13 +180,15 @@ def process_files(iname=False,
                 continuum_flux_Gaussian = []
                 continuum_noise_Gaussian = []
             if csigmaclip:
+                continuum_flux_sigmaclip_prev = []
                 continuum_flux_sigmaclip = []
                 continuum_noise_sigmaclip = []
 
             # Loop through y pixels
             for ypix in range(nypix):
 
-                print("... analyzing column " + str(ypix+1) + " out of " + str(nypix))
+                if betaversion is False:
+                    print("... analyzing column " + str(ypix+1) + " out of " + str(nypix))
 
                 if cmax:
                     continuum_flux_maximum.append([])
@@ -201,6 +209,7 @@ def process_files(iname=False,
                     continuum_flux_Gaussian.append([])
                     continuum_noise_Gaussian.append([])
                 if csigmaclip:
+                    continuum_flux_sigmaclip_prev.append([])
                     continuum_flux_sigmaclip.append([])
                     continuum_noise_sigmaclip.append([])
 
@@ -245,156 +254,222 @@ def process_files(iname=False,
 
                     # Determine CONTINUUM as the MAXIMUM of the histogram
                     if cmax:
-                        maximum_flux = c_max(flux, rms_noise)
+                        
+                        if np.isnan(np.min(flux)):
+                            maximum_flux = float('nan')
+
+                            if verbose:
+                                print("    flux of maximum      = masked")
+
+                        else:
+                            maximum_flux = c_max(flux, rms_noise)
+
+                            if verbose:
+                                print("    flux of maximum      = " + str(int(maximum_flux*1.e5)/1.e5))
 
                         continuum_flux_maximum[ypix].append(maximum_flux)
 
-                        if verbose:
-                            print("    flux of maximum      = " + str(int(maximum_flux*1.e5)/1.e5))
-
                     # Determine CONTINUUM as the MEAN of the intensities
                     if cmean:
-                        mean_flux, meansel_flux = c_mean(flux, rms_noise)
+                        
+                        if np.isnan(np.min(flux)):
+                            mean_flux = meansel_flux = float('nan')
+
+                            if verbose:
+                                print("    flux of mean (all)   = masked")
+                                print("    flux of mean (sel)   = masked")
+                        
+                        else:
+                            mean_flux, meansel_flux = c_mean(flux, rms_noise)
+
+                            if verbose:
+                                print("    flux of mean (all)   = " + str(int(mean_flux*1.e5)/1.e5))
+                                print("    flux of mean (sel)   = " + str(int(meansel_flux*1.e5)/1.e5))
 
                         continuum_flux_mean[ypix].append(mean_flux)
                         continuum_flux_meansel[ypix].append(meansel_flux)
 
-                        if verbose:
-                            print("    flux of mean (all)   = " + str(int(mean_flux*1.e5)/1.e5))
-                            print("    flux of mean (sel)   = " + str(int(meansel_flux*1.e5)/1.e5))
-
                     # Determine CONTINUUM as the MEDIAN of the intensities
                     if cmedian:
-                        median_flux, mediansel_flux = c_median(flux, rms_noise)
+                        
+                        if np.isnan(np.min(flux)):
+                            median_flux = mediansel_flux = float('nan')
+
+                            if verbose:
+                                print("    flux of median (all) = masked")
+                                print("    flux of median (sel) = masked")
+                        
+                        else:
+                            median_flux, mediansel_flux = c_median(flux, rms_noise)
+
+                            if verbose:
+                                print("    flux of median (all) = " + str(int(median_flux*1.e5)/1.e5))
+                                print("    flux of median (sel) = " + str(int(mediansel_flux*1.e5)/1.e5))
 
                         continuum_flux_median[ypix].append(median_flux)
                         continuum_flux_mediansel[ypix].append(mediansel_flux)
 
-                        if verbose:
-                            print("    flux of median (all) = " + str(int(median_flux*1.e5)/1.e5))
-                            print("    flux of median (sel) = " + str(int(mediansel_flux*1.e5)/1.e5))
-
                     # Determine CONTINUUM as the 25th and 75th percentiles of the intensities
                     if cpercent:
-                        percent25_flux = c_percent(flux, percentile=25)
-                        percent75_flux = c_percent(flux, percentile=75)
+
+                        if np.isnan(np.min(flux)):
+                            percent25_flux = percent75_flux = float('nan')
+
+                            if verbose:
+                                print("    flux of percent 25   = masked")
+                                print("    flux of percent 75   = masked")
+
+                        else:
+                            percent25_flux = c_percent(flux, percentile=25)
+                            percent75_flux = c_percent(flux, percentile=75)
+
+                            if verbose:
+                                print("    flux of percent 25   = " + str(int(percent25_flux*1.e5)/1.e5))
+                                print("    flux of percent 75   = " + str(int(percent75_flux*1.e5)/1.e5))
 
                         continuum_flux_percent25[ypix].append(percent25_flux)
                         continuum_flux_percent75[ypix].append(percent75_flux)
 
-                        if verbose:
-                            print("    flux of percent 25   = " + str(int(percent25_flux*1.e5)/1.e5))
-                            print("    flux of percent 75   = " + str(int(percent75_flux*1.e5)/1.e5))
-
-
                     # Determine CONTINUUM as the maximum of a KDE distribution
                     if cKDEmax:
-                        KDEmax_flux = c_KDEmax(flux, rms_noise)
+                        
+                        if np.isnan(np.min(flux)):
+                            KDEmax_flux = float('nan')
+
+                            if verbose:
+                                print("    flux of KDEmax       = masked")
+                            
+                        else:
+                            KDEmax_flux = c_KDEmax(flux, rms_noise)
+
+                            if verbose:
+                                print("    flux of KDEmax       = " + str(int(KDEmax_flux*1.e5)/1.e5))
 
                         continuum_flux_KDEmax[ypix].append(KDEmax_flux)
-
-                        if verbose:
-                            print("    flux of KDEmax       = " + str(int(KDEmax_flux*1.e5)/1.e5))
 
                     # Determine CONTINUUM as the center of a GAUSSIAN fit to the histogram
                     if cGaussian:
                         
-                        Gaussian_flux, Gaussian_noise, GaussNw_flux, GaussNw_noise = c_Gaussian(flux, rms_noise)
+                        if np.isnan(np.min(flux)):
+                            Gaussian_flux = Gaussian_noise = GaussNw_flux = GaussNw_noise = float('nan')
+
+                            if verbose:
+                                print("    flux of Gaussian     = masked")
+                                print("    flux of Gauss (sel)  = masked")
+
+                        else:
+                            Gaussian_flux, Gaussian_noise, GaussNw_flux, GaussNw_noise = c_Gaussian(flux, rms_noise)
+
+                            if verbose:
+                                print("    flux of Gaussian     = " + str(int(Gaussian_flux*1.e5)/1.e5) + " +/- " + str(int(Gaussian_noise*1.e5)/1.e5))
+                                print("    flux of Gauss (sel)  = " + str(int(GaussNw_flux*1.e5)/1.e5) + " +/- " + str(int(GaussNw_noise*1.e5)/1.e5))
 
                         continuum_flux_Gaussian[ypix].append(Gaussian_flux)
                         continuum_noise_Gaussian[ypix].append(Gaussian_noise)
                         continuum_flux_GaussNw[ypix].append(GaussNw_flux)
                         continuum_noise_GaussNw[ypix].append(GaussNw_noise)
 
-                        if verbose:
-                            print("    flux of Gaussian     = " + str(int(Gaussian_flux*1.e5)/1.e5) + " +/- " + str(int(Gaussian_noise*1.e5)/1.e5))
-                            print("    flux of Gauss (sel)  = " + str(int(GaussNw_flux*1.e5)/1.e5) + " +/- " + str(int(GaussNw_noise*1.e5)/1.e5))
-
                     # Determine CONTINUUM using a corrected version of SIGMA-CLIPPING
                     if csigmaclip:
 
-                        sigmaclip_flux, sigmaclip_noise = c_sigmaclip(flux, rms_noise)
+                        if np.isnan(np.min(flux)):
+                            sigmaclip_flux_prev = sigmaclip_flux = sigmaclip_noise = float('nan')
 
+                            if verbose:
+                                print("    flux of sigma-clip   = masked")
+                                print("    flux of c-sigma-clip = masked")
+
+                        else:
+                            sigmaclip_flux_prev, sigmaclip_flux, sigmaclip_noise, emission_v1, emission_v2, absorption_v1, absorption_v2 = c_sigmaclip(flux, rms_noise)
+
+                            if verbose:
+                                print("    flux of sigma-clip   = " + str(int(sigmaclip_flux_prev*1.e5)/1.e5) + " +/- " + str(int(sigmaclip_noise*1.e5)/1.e5))
+                                print("    flux of c-sigma-clip = " + str(int(sigmaclip_flux*1.e5)/1.e5) + " +/- " + str(int(sigmaclip_noise*1.e5)/1.e5))
+
+                        continuum_flux_sigmaclip_prev[ypix].append(sigmaclip_flux_prev)
                         continuum_flux_sigmaclip[ypix].append(sigmaclip_flux)
                         continuum_noise_sigmaclip[ypix].append(sigmaclip_noise)
 
-                        if verbose:
-                            print("    flux of sigma-clip   = " + str(int(sigmaclip_flux*1.e5)/1.e5) + " +/- " + str(int(sigmaclip_noise*1.e5)/1.e5))
-
                     # Create plots with spectra and different continuum levels
                     if plots:
-                        fig_file = plots_path + tmp_file + '_' + str(xpix+1) + '_' + str(ypix+1) + '.png'
-                        fig1 = plt.figure()
-                        gs = gridspec.GridSpec(3,1)
-                        ax1 = fig1.add_subplot(gs[0,0])
-                        ax1.axis('off')
-                        ax2 = fig1.add_subplot(gs[1:3,0])
+                        if np.isnan(np.min(flux)):
+                            if verbose:
+                                print("    ... masked pixel, no plot produced")
 
-                        ax2.plot(freq,flux, 'k-')
-                        plt.xlim(freq.min(), freq.max())
-                        plt.ylim(flux.min(), flux.max())
-                        ax1.set_title('Spectrum and continuum level at pixel (' + str(xpix+1) + ',' + str(ypix+1) + ')')
-                        if cmax:
-                            ax2.axhline(y=maximum_flux, linestyle='--', color='green', linewidth='1.5')
-                            if iname or ifile:
-                                ax1.text(0.0, 0.9, "Maximum = " + str(int(maximum_flux*1.e5)/1.e5) + " " + bunit)
-                            if ispec:
-                                ax1.text(0.0, 0.8, "Maximum = " + str(int(maximum_flux*1.e5)/1.e5))
-                        if cmean:
-                            ax2.axhline(y=mean_flux, linestyle='--', color='orange', linewidth='1.5')
-                            ax2.axhline(y=meansel_flux, linestyle='--', color='yellow', linewidth='1.5')
-                            if iname or ifile:
-                                ax1.text(0.0, 0.6, "Mean = " + str(int(mean_flux*1.e5)/1.e5) + " " + bunit)
-                                ax1.text(0.0, 0.4, "Mean (sel.) = " + str(int(meansel_flux*1.e5)/1.e5) + " " + bunit)
-                            if ispec:
-                                ax1.text(0.0, 0.6, "Mean = " + str(int(mean_flux*1.e5)/1.e5))
-                                ax1.text(0.0, 0.4, "Mean (sel.) = " + str(int(meansel_flux*1.e5)/1.e5))
-                        if cmedian:
-                            ax2.axhline(y=median_flux, linestyle='--', color='orange', linewidth='1.5')
-                            ax2.axhline(y=mediansel_flux, linestyle='--', color='yellow', linewidth='1.5')
-                            if iname or ifile:
-                                ax1.text(0.0, 0.2, "Median = " + str(int(median_flux*1.e5)/1.e5) + " " + bunit)
-                                ax1.text(0.0, 0.0, "Median (sel.) = " + str(int(mediansel_flux*1.e5)/1.e5) + " " + bunit)
-                            if ispec:
-                                ax1.text(0.0, 0.2, "Median = " + str(int(median_flux*1.e5)/1.e5))
-                                ax1.text(0.0, 0.0, "Median (sel.) = " + str(int(mediansel_flux*1.e5)/1.e5))
-                        if cpercent:
-                            ax2.axhline(y=percent25_flux, linestyle='--', color='red', linewidth='1.5')
-                            ax2.axhline(y=percent75_flux, linestyle='--', color='red', linewidth='1.5')
-                            if iname or ifile:
-                                ax1.text(0.4, 0.8, "Percent 25th = " + str(int(percent25_flux*1.e5)/1.e5) + " " + bunit)
-                            if ispec:
-                                ax1.text(0.4, 0.8, "Percent 25th = " + str(int(percent25_flux*1.e5)/1.e5))
-                        if cKDEmax:
-                            ax2.axhline(y=KDEmax_flux, linestyle='-', color='black', linewidth='1.5')
-                            if iname or ifile:
-                                ax1.text(0.4, 0.6, "KDE max = " + str(int(KDEmax_flux*1.e5)/1.e5) + " " + bunit)
-                            if ispec:
-                                ax1.text(0.4, 0.6, "KDE max = " + str(int(KDEmax_flux*1.e5)/1.e5))
-                        if cGaussian:
-                            ax2.axhline(y=Gaussian_flux, linestyle='-', color='blue', linewidth='3.0', alpha=0.5)
-                            ax2.axhline(y=GaussNw_flux, linestyle='-', color='cyan', linewidth='3.0', alpha=0.5)
-                            if iname or ifile:
-                                ax1.text(0.4, 0.4, "Gaussian = " + str(int(Gaussian_flux*1.e5)/1.e5) + " " + bunit + " (+/- " + str(int(Gaussian_noise*1.e5)/1.e5) + ")")
-                                ax1.text(0.4, 0.2, "Gaussian (sel.) = " + str(int(GaussNw_flux*1.e5)/1.e5) + " " + bunit + " (+/- " + str(int(GaussNw_noise*1.e5)/1.e5) + ")")
-                            if ispec:
-                                ax1.text(0.4, 0.4, "Gaussian = " + str(int(Gaussian_flux*1.e5)/1.e5) + " (+/- " + str(int(Gaussian_noise*1.e5)/1.e5) + ")")
-                                ax1.text(0.4, 0.2, "Gaussian (sel.) = " + str(int(GaussNw_flux*1.e5)/1.e5) + " (+/- " + str(int(GaussNw_noise*1.e5)/1.e5) + ")")
-                        if csigmaclip:
-                            ax2.axhline(y=sigmaclip_flux, linestyle='-', color='red', linewidth='1.5')
-                            if iname or ifile:
-                                ax1.text(0.4, 0.0, "corrSigma-clip = " + str(int(sigmaclip_flux*1.e5)/1.e5) + " " + bunit + " (+/- " + str(int(sigmaclip_noise*1.e5)/1.e5) + ")")
-                            if ispec:
-                                ax1.text(0.4, 0.0, "corrSigma-clip = " + str(int(sigmaclip_flux*1.e5)/1.e5) + " (+/- " + str(int(sigmaclip_noise*1.e5)/1.e5) + ")")
-                        plt.xlabel('Frequency')
-                        plt.ylabel('Intensity')
+                        else:
+                            fig_file = plots_path + tmp_file + '_' + str(xpix+1) + '_' + str(ypix+1) + '.png'
+                            fig1 = plt.figure()
+                            gs = gridspec.GridSpec(3,1)
+                            ax1 = fig1.add_subplot(gs[0,0])
+                            ax1.axis('off')
+                            ax2 = fig1.add_subplot(gs[1:3,0])
 
-                        fig1.savefig(fig_file)
-                        plt.close(fig1)
+                            ax2.plot(freq,flux, 'k-')
+                            plt.xlim(freq.min(), freq.max())
+                            plt.ylim(flux.min(), flux.max())
+                            ax1.set_title('Spectrum and continuum level at pixel (' + str(xpix+1) + ',' + str(ypix+1) + ')')
+                            if cmax:
+                                ax2.axhline(y=maximum_flux, linestyle='--', color='green', linewidth='1.5')
+                                if iname or ifile:
+                                    ax1.text(0.0, 0.9, "Maximum = " + str(int(maximum_flux*1.e5)/1.e5) + " " + bunit)
+                                if ispec:
+                                    ax1.text(0.0, 0.8, "Maximum = " + str(int(maximum_flux*1.e5)/1.e5))
+                            if cmean:
+                                ax2.axhline(y=mean_flux, linestyle='--', color='orange', linewidth='1.5')
+                                ax2.axhline(y=meansel_flux, linestyle='--', color='yellow', linewidth='1.5')
+                                if iname or ifile:
+                                    ax1.text(0.0, 0.6, "Mean = " + str(int(mean_flux*1.e5)/1.e5) + " " + bunit)
+                                    ax1.text(0.0, 0.4, "Mean (sel.) = " + str(int(meansel_flux*1.e5)/1.e5) + " " + bunit)
+                                if ispec:
+                                    ax1.text(0.0, 0.6, "Mean = " + str(int(mean_flux*1.e5)/1.e5))
+                                    ax1.text(0.0, 0.4, "Mean (sel.) = " + str(int(meansel_flux*1.e5)/1.e5))
+                            if cmedian:
+                                ax2.axhline(y=median_flux, linestyle='--', color='orange', linewidth='1.5')
+                                ax2.axhline(y=mediansel_flux, linestyle='--', color='yellow', linewidth='1.5')
+                                if iname or ifile:
+                                    ax1.text(0.0, 0.2, "Median = " + str(int(median_flux*1.e5)/1.e5) + " " + bunit)
+                                    ax1.text(0.0, 0.0, "Median (sel.) = " + str(int(mediansel_flux*1.e5)/1.e5) + " " + bunit)
+                                if ispec:
+                                    ax1.text(0.0, 0.2, "Median = " + str(int(median_flux*1.e5)/1.e5))
+                                    ax1.text(0.0, 0.0, "Median (sel.) = " + str(int(mediansel_flux*1.e5)/1.e5))
+                            if cpercent:
+                                ax2.axhline(y=percent25_flux, linestyle='--', color='red', linewidth='1.5')
+                                ax2.axhline(y=percent75_flux, linestyle='--', color='red', linewidth='1.5')
+                                if iname or ifile:
+                                    ax1.text(0.4, 0.8, "Percent 25th = " + str(int(percent25_flux*1.e5)/1.e5) + " " + bunit)
+                                if ispec:
+                                    ax1.text(0.4, 0.8, "Percent 25th = " + str(int(percent25_flux*1.e5)/1.e5))
+                            if cKDEmax:
+                                ax2.axhline(y=KDEmax_flux, linestyle='-', color='black', linewidth='1.5')
+                                if iname or ifile:
+                                    ax1.text(0.4, 0.6, "KDE max = " + str(int(KDEmax_flux*1.e5)/1.e5) + " " + bunit)
+                                if ispec:
+                                    ax1.text(0.4, 0.6, "KDE max = " + str(int(KDEmax_flux*1.e5)/1.e5))
+                            if cGaussian:
+                                ax2.axhline(y=Gaussian_flux, linestyle='-', color='blue', linewidth='3.0', alpha=0.5)
+                                ax2.axhline(y=GaussNw_flux, linestyle='-', color='cyan', linewidth='3.0', alpha=0.5)
+                                if iname or ifile:
+                                    ax1.text(0.4, 0.4, "Gaussian = " + str(int(Gaussian_flux*1.e5)/1.e5) + " " + bunit + " (+/- " + str(int(Gaussian_noise*1.e5)/1.e5) + ")")
+                                    ax1.text(0.4, 0.2, "Gaussian (sel.) = " + str(int(GaussNw_flux*1.e5)/1.e5) + " " + bunit + " (+/- " + str(int(GaussNw_noise*1.e5)/1.e5) + ")")
+                                if ispec:
+                                    ax1.text(0.4, 0.4, "Gaussian = " + str(int(Gaussian_flux*1.e5)/1.e5) + " (+/- " + str(int(Gaussian_noise*1.e5)/1.e5) + ")")
+                                    ax1.text(0.4, 0.2, "Gaussian (sel.) = " + str(int(GaussNw_flux*1.e5)/1.e5) + " (+/- " + str(int(GaussNw_noise*1.e5)/1.e5) + ")")
+                            if csigmaclip:
+                                ax2.axhline(y=sigmaclip_flux, linestyle='-', color='red', linewidth='1.5')
+                                if iname or ifile:
+                                    ax1.text(0.4, 0.0, "corrSigma-clip = " + str(int(sigmaclip_flux*1.e5)/1.e5) + " " + bunit + " (+/- " + str(int(sigmaclip_noise*1.e5)/1.e5) + ")")
+                                if ispec:
+                                    ax1.text(0.4, 0.0, "corrSigma-clip = " + str(int(sigmaclip_flux*1.e5)/1.e5) + " (+/- " + str(int(sigmaclip_noise*1.e5)/1.e5) + ")")
+                            plt.xlabel('Frequency')
+                            plt.ylabel('Intensity')
+
+                            fig1.savefig(fig_file)
+                            plt.close(fig1)
 
             # Write the output continuum file
-            print(" ")
-            print("... CONTINUUM FILEs CREATED: ")
+            if betaversion is False:
+                print(" ")
+                print("... CONTINUUM FILEs CREATED: ")
 
 
             # Create output files with the CONTINUUM estimated values
@@ -451,7 +526,8 @@ def process_files(iname=False,
                 output_fluxs.append(continuum_noise_sigmaclip)
 
             for output_file, output_flux in zip(output_files, output_fluxs):
-                print("  . " + output_file)
+                if verbose:
+                    print("  . " + output_file)
                 os.system('rm -rf ' + output_file)
                 if iname or ifile:
                     fits.writeto(output_file, np.float32(output_flux), header=header, clobber=True)
@@ -459,6 +535,12 @@ def process_files(iname=False,
                     output_array = [np.median(freq)]
                     output_array.append(output_flux[0][0])
                     np.savetxt(output_file, output_array, newline=" ")
+
+            # For statistics (to be removed)
+            if betaversion:
+                print('%4.1f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f' % (rms_noise, 50, int(mean_flux*1.e5)/1.e5, int(KDEmax_flux*1.e5)/1.e5, int(Gaussian_flux*1.e5)/1.e5, int(Gaussian_noise*1.e5)/1.e5, int(GaussNw_flux*1.e5)/1.e5, int(GaussNw_noise*1.e5)/1.e5, int(sigmaclip_flux_prev*1.e5)/1.e5, int(sigmaclip_noise*1.e5)/1.e5, int(emission_v1*1.e5)/1.e5, int(absorption_v1*1.e5)/1.e5, int(emission_v2*1.e5)/1.e5, int(absorption_v2*1.e5)/1.e5) )
+                #print(rms_noise, 50, int(mean_flux*1.e5)/1.e5, int(KDEmax_flux*1.e5)/1.e5, int(Gaussian_flux*1.e5)/1.e5, int(Gaussian_noise*1.e5)/1.e5, int(GaussNw_flux*1.e5)/1.e5, int(GaussNw_noise*1.e5)/1.e5, int(sigmaclip_flux_prev*1.e5)/1.e5, int(sigmaclip_noise*1.e5)/1.e5, int(emission_v1*1.e5)/1.e5, int(absorption_v1*1.e5)/1.e5, int(emission_v2*1.e5)/1.e5, int(absorption_v2*1.e5)/1.e5 )
+                
 
     if continuum:
         
@@ -668,7 +750,8 @@ def process_files(iname=False,
 
             for ypix in range(nypix):
 
-                print("... analyzing column " + str(ypix+1) + " out of " + str(nypix))
+                if betaversion is False:
+                    print("... analyzing column " + str(ypix+1) + " out of " + str(nypix))
 
                 m.append([])
                 n.append([])

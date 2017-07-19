@@ -44,6 +44,11 @@ def fits_cutout(filename, xc, yc, size, outfile):
 
     xmin, xmax = np.max([0, xc - size / 2]), np.min([head['NAXIS1'], xc + size / 2])
     ymin, ymax = np.max([0, yc - size / 2]), np.min([head['NAXIS2'], yc + size / 2])
+    
+    xmin = int(xmin)
+    xmax = int(xmax)
+    ymin = int(ymin)
+    ymax = int(ymax)
 
     if xmax < 0 or ymax < 0:
         raise ValueError("Max Coordinate is outside of map: %f, %f." % (xmax, ymax))

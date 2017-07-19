@@ -87,7 +87,9 @@ def main(args=None):
                             Spectrum with continuum (and noise) levels indicated \
                             (computing time increases considerably)')
     pars.add_argument('--verbose', action='store_true',
-                      help='TEST: Increase output verbosity')
+                      help='OPTIONAL: Increase output verbosity')
+    pars.add_argument('--betaversion', action='store_true',
+                      help='DEVELOPERS: Fot developer testing')
     op = pars.parse_args(args)
 
     # Select all continuum determination methods when --call is used
@@ -121,6 +123,10 @@ def main(args=None):
     if op.model:
         op.spindex = True
     
+    # For developers, activate some specific functions
+    if op.betaversion:
+        op.verbose = False
+        
     # Noise level of your data cubes (in units of the FITS file)
     rms_noise = op.noise[0]
 
@@ -144,4 +150,5 @@ def main(args=None):
                   model=op.model,
                   plots=op.plots,
                   cutout=op.cutout,
-                  verbose=op.verbose)
+                  verbose=op.verbose,
+                  betaversion=op.betaversion)

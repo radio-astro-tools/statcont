@@ -8,8 +8,9 @@
  STATCONT: A statistical continuum level determination method for
            line-rich sources"
 
- Sanchez-Monge, Alvaro et al (2017, A&A, submitted)
- version 1.0.0
+ Sanchez-Monge et al (2017, A&A, submitted)
+ Details in https://hera.ph1.uni-koeln.de/~sanchez/statcont
+ version 1.1
 
 """
 
@@ -21,7 +22,8 @@ from .statcont_main import process_files
 def main(args=None):
 
     # Creating the list of options
-    pars = argparse.ArgumentParser(description="STATCONT : continuum emission level determination")
+    pars = argparse.ArgumentParser(description="+++ ----------------------------------------------------------------------- \
+                                                +++ STATCONT : A statistical continuum level determination method (v 1.1)")
     grou = pars.add_mutually_exclusive_group()
     grou.add_argument('-i', '--iname', nargs='*',
                       help='NECESSARY: unless parameters -f or -s are considered. \
@@ -45,7 +47,7 @@ def main(args=None):
     pars.add_argument('-n', '--noise', nargs=1, type=float,
                       help='NECESSARY: RMS noise level of the observataions')
     pars.add_argument('--continuum', action='store_true',
-                      help='OPTIONAL: Determination of the continuum level \
+                      help='OPTIONAL: Determination of the continuum (and noise) \
                             Method SIGMACLIP (--csigmaclip) is used by default\
                             Subtraction of continuum to line data (--cfree)')
     pars.add_argument('--cmax', action='store_true',
@@ -86,11 +88,29 @@ def main(args=None):
                       help='OPTIONAL: Create plots on a pixel-by-pixel basis \
                             Spectrum with continuum (and noise) levels indicated \
                             (computing time increases considerably)')
-    pars.add_argument('--verbose', action='store_true',
-                      help='OPTIONAL: Increase output verbosity')
+    pars.add_argument('--verbose', nargs='?', type=int, const=1, default=2,
+                      help='OPTIONAL: Modify level of output verbosity (default 2) \
+                            0: Switch off from terminal all message communications \
+                            1: Only important messages are displayed in terminal \
+                            2: Standard level of output verbosity (default value) \
+                            3: Increase level of output verbosity (more details) \
+                            4: Switch on all messages (for developers)')
     pars.add_argument('--betaversion', action='store_true',
-                      help='DEVELOPERS: Fot developer testing')
+                      help='DEVELOPERS: For developers and testing')
     op = pars.parse_args(args)
+    
+    # Modify level of output verbosity
+    verbose = op.verbose
+
+    # Activate level 2 of verbosity for ASCII spectra
+    # Can be overwritten by specifying the verbosity output level
+    if op.ispec and verbose == 2:
+        verbose = 3
+    
+    # For developers, activate maximum verbosity
+    # Can be overwritten by specifying the verbosity output level
+    if op.betaversion and verbose == 2:
+        verbose = 4
 
     # Select all continuum determination methods when --call is used
     if op.call:
@@ -122,14 +142,10 @@ def main(args=None):
     # Activate the determination of the spectral index --spindex, if the model wants to be created
     if op.model:
         op.spindex = True
-    
-    # For developers, activate some specific functions
-    if op.betaversion:
-        op.verbose = False
-        
+            
     # Noise level of your data cubes (in units of the FITS file)
     rms_noise = op.noise[0]
-
+    
     process_files(iname=op.iname,
                   ifile=op.ifile,
                   ispec=op.ispec,
@@ -150,5 +166,5 @@ def main(args=None):
                   model=op.model,
                   plots=op.plots,
                   cutout=op.cutout,
-                  verbose=op.verbose,
+                  verbose=verbose,
                   betaversion=op.betaversion)

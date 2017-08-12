@@ -3,6 +3,7 @@ from astropy.stats import sigma_clip
 import numpy as np
 from scipy import stats
 from scipy.optimize import leastsq
+import astropy.io.ascii as ascii
 
 ##======================================================================
 def c_max(flux, rms_noise):
@@ -111,7 +112,7 @@ def c_percent(flux, percentile):
     return percent_flux
 
 ##======================================================================
-def c_KDEmax(flux, rms_noise):
+def c_KDEmax(flux, rms_noise, betaversion):
     """
     Perform KDE of the distribution and determine the position of the
     maximum
@@ -122,6 +123,8 @@ def c_KDEmax(flux, rms_noise):
         One-dimension array of flux values
     rms_noise : float
         The estimated RMS noise level of the data
+    betaversion : logic
+        Activate more functionalities for developers
     
     Returns
     -------
@@ -130,13 +133,29 @@ def c_KDEmax(flux, rms_noise):
         of the KDE
     """
 
-    KDE_bandwidth = rms_noise/10.
+    # Definition of the kernel following Silverman's rule
+    #  - width = [4/(3*ndata)]^(1/5)*min(dispersion, IQR/1/.34)
+    # In SciPy the dispersion is included in the covariance factor
+    # and therefore we need to divide by this factor
+    # Following Silverman 1998, Eqs 3.28 and 3.30
+    # B. W. Silverman, Density Estimation for Statistics and Data Analysis (CRC Press, Boca Raton, 1998)
+    #
+    # For manual definition of the kernel width, in SciPy:
+    #  - KDE_bandwidth = rms_noise/np.std(flux)
+    # with this expression the kernel width equals "rms_noise"
+
+    Silverman_spread = min(np.std(flux), ((np.percentile(flux, 75)-np.percentile(flux, 25))/1.34))
+    KDE_bandwidth = ((4./(3.*len(flux)))**(1./5.)*Silverman_spread)/np.std(flux)
     scipy_kde = stats.gaussian_kde(flux, bw_method=KDE_bandwidth)
     KDExmin, KDExmax = min(flux), max(flux)
-    KDEx = np.mgrid[KDExmin:KDExmax:100j]
+    KDEx = np.mgrid[KDExmin:KDExmax:5000j]
     positions = np.vstack([KDEx.ravel()])
     KDEpos = scipy_kde(positions)
     KDEmax_flux = positions.T[np.argmax(KDEpos)]
+    
+    # Write out the KDE as ASCII file
+    if betaversion:
+        ascii.write((KDEx, KDEpos), output='developers/STATCONT_KDE_distribution.dat')
     
     return KDEmax_flux
 
@@ -192,7 +211,7 @@ def c_Gaussian(flux, rms_noise):
     return Gaussian_flux, Gaussian_noise, GaussNw_flux, GaussNw_noise
 
 ##======================================================================
-def c_sigmaclip(flux, rms_noise, sigma_clip_threshold=1.8):
+def c_sigmaclip(flux, rms_noise, betaversion, sigma_clip_threshold=1.8):
     """
     Perform sigma-clipping to determine the mean flux level, with different
     adaptations for emission- and absorption-dominated spectra
@@ -203,6 +222,8 @@ def c_sigmaclip(flux, rms_noise, sigma_clip_threshold=1.8):
         One-dimension array of flux values
     rms_noise : float
         The estimated RMS noise level of the data
+    betaversion : logic
+        Activate more functionalities for developers
     sigma_clip_threshold : float
         The threshold in number of sigma above/below which to reject outlier
         data
@@ -225,58 +246,71 @@ def c_sigmaclip(flux, rms_noise, sigma_clip_threshold=1.8):
                                    iters=None)
     elif astropy.version.major < 1:
         filtered_data = sigma_clip(flux, sig=sigma_clip_threshold, iters=None)
-
+        
     sigmaclip_flux_prev = sigmaclip_flux = np.mean(filtered_data)
     sigmaclip_noise = sigmaclip_sigma = np.std(filtered_data)
     mean_flux = np.mean(flux)
     
-    # Determining the numbers of channels above and under the continuum level
-    # i.e. how many channels are in emission/absorption with respect to the total
-    # For betaversion
-    emission_v1 = 0
-    absorption_v1 = 0
-    emission_v1 = sum(i > (50.0+1*rms_noise) for i in flux)
-    emission_v1 = 100*emission_v1/len(flux)
-    absorption_v1 = sum(i < (50.0-1*rms_noise) for i in flux)
-    absorption_v1 = 100*absorption_v1/len(flux)
-    #
-    # For correction to the sigma-clipping continuum level
-    emission_v2 = 0
-    absorption_v2 = 0
-    emission_v2 = sum(i > (sigmaclip_flux+1*rms_noise) for i in flux)
-    emission_v2 = 100*emission_v2/len(flux)
-    absorption_v2 = sum(i < (sigmaclip_flux-1*rms_noise) for i in flux)
-    absorption_v2 = 100*absorption_v2/len(flux)
+    # Correction of sigma-clip continuum level, making use of the
+    # presence of emission and/or absorption line features
+    
+    # Set up the fraction of channels (in %) that are in emission
+    fraction_emission = 0
+    fraction_emission = sum(i > (sigmaclip_flux+1*rms_noise) for i in flux)
+    fraction_emission = 100*fraction_emission/len(flux)
+    
+    # Set up the fraction of channels (in %) that are in absorption
+    fraction_absorption = 0
+    fraction_absorption = sum(i < (sigmaclip_flux-1*rms_noise) for i in flux)
+    fraction_absorption = 100*fraction_absorption/len(flux)
 
-    # Applying corrections to the sigma-clipping continuum level
-    # 
-    if (emission_v2 < 33 and absorption_v2 < 33):
+    # Apply correction to continuum level
+    if (fraction_emission < 33 and fraction_absorption < 33):
         sigmaclip_flux = sigmaclip_flux_prev
-    elif (emission_v2 >= 33 and absorption_v2 < 33):
-        if (emission_v2-absorption_v2 > 25):
+    elif (fraction_emission >= 33 and fraction_absorption < 33):
+        if (fraction_emission-fraction_absorption > 25):
             sigmaclip_flux = sigmaclip_flux_prev - 1.0*sigmaclip_sigma
-        if (emission_v2-absorption_v2 <= 25):
+        if (fraction_emission-fraction_absorption <= 25):
             sigmaclip_flux = sigmaclip_flux_prev - 0.5*sigmaclip_sigma
-    elif (emission_v2 < 33 and absorption_v2 >= 33):
-        if (absorption_v2-emission_v2 > 25):
+    elif (fraction_emission < 33 and fraction_absorption >= 33):
+        if (fraction_absorption-fraction_emission > 25):
             sigmaclip_flux = sigmaclip_flux_prev + 1.0*sigmaclip_sigma
-        if (absorption_v2-emission_v2 <= 25):
+        if (fraction_absorption-fraction_emission <= 25):
             sigmaclip_flux = sigmaclip_flux_prev + 0.5*sigmaclip_sigma
-    elif (emission_v2 >= 33 and absorption_v2 >= 33):
-        if (emission_v2-absorption_v2 > 25):
+    elif (fraction_emission >= 33 and fraction_absorption >= 33):
+        if (fraction_emission-fraction_absorption > 25):
             sigmaclip_flux = sigmaclip_flux_prev - 1.0*sigmaclip_sigma
-        if (absorption_v2-emission_v2 > 25):
+        if (fraction_absorption-fraction_emission > 25):
             sigmaclip_flux = sigmaclip_flux_prev + 1.0*sigmaclip_sigma
-        if (abs(absorption_v2-emission_v2) <= 25):
+        if (abs(fraction_absorption-fraction_emission) <= 25):
             sigmaclip_flux = sigmaclip_flux_prev
-    ## For EMISSION-dominated spectra
-    #if (mean_flux-sigmaclip_flux_prev) > (+1.0*rms_noise):
-    #    sigmaclip_flux = sigmaclip_flux_prev - sigmaclip_sigma
-    ## For ABSORPTION-dominated spectra
-    #elif (mean_flux-sigmaclip_flux_prev) < (-1.0*rms_noise):
-    #    sigmaclip_flux = sigmaclip_flux_prev + sigmaclip_sigma
 
-    return sigmaclip_flux_prev, sigmaclip_flux, sigmaclip_noise, emission_v1, emission_v2, absorption_v1, absorption_v2
+    if betaversion is False:
+        return sigmaclip_flux_prev, sigmaclip_flux, sigmaclip_noise
+
+    # Write out the original and filtered data as a two-column ASCII file
+    if betaversion:
+        ascii.write((flux, filtered_data), output='developers/STATCONT_sigmaclip_filtered.dat')
+        
+        # Determine the numbers of channels above and under the real continuum level,
+        # for synthetic files with continuum level set to 50.0
+        # (i.e. how many channels are in emission/absorption with respect to the total)
+        #
+        real_fraction_emission = 0
+        real_fraction_emission = sum(i > (50.0+1*rms_noise) for i in flux)
+        real_fraction_emission = 100*real_fraction_emission/len(flux)
+        real_fraction_absorption = 0
+        real_fraction_absorption = sum(i < (50.0-1*rms_noise) for i in flux)
+        real_fraction_absorption = 100*real_fraction_absorption/len(flux)
+
+        return sigmaclip_flux_prev, sigmaclip_flux, sigmaclip_noise, real_fraction_emission, fraction_emission, real_fraction_absorption, fraction_absorption
+    
+    ### For EMISSION-dominated spectra
+    ##if (mean_flux-sigmaclip_flux_prev) > (+1.0*rms_noise):
+    ##    sigmaclip_flux = sigmaclip_flux_prev - sigmaclip_sigma
+    ### For ABSORPTION-dominated spectra
+    ##elif (mean_flux-sigmaclip_flux_prev) < (-1.0*rms_noise):
+    ##    sigmaclip_flux = sigmaclip_flux_prev + sigmaclip_sigma
 
 ##======================================================================
 def cont_histo(flux, rms_noise):
@@ -315,7 +349,7 @@ def cont_histo(flux, rms_noise):
     #   all_hist     - counts in each bin of the histogram
     #   all_bins     - location of the bins (fluxes)
     #   all_number_* - index of the array
-    number_bins = int((np.amax(flux)-np.amin(flux))/(2*rms_noise))
+    number_bins = int((np.amax(flux)-np.amin(flux))/(1*rms_noise))
     all_hist, all_bin_edges = np.histogram(flux, number_bins)
     all_bins = all_bin_edges[0:len(all_bin_edges)-1]
     all_bins = [x + (all_bins[1]-all_bins[0])/2. for x in all_bins]

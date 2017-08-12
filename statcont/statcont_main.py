@@ -35,7 +35,7 @@ def process_files(iname=False,
                   model=False,
                   plots=False,
                   cutout=False,
-                  verbose=False,
+                  verbose=None,
                   betaversion=False):
 
     # Read name of files to be processed
@@ -55,11 +55,12 @@ def process_files(iname=False,
     elif ispec:
         input_files = ispec
         extension = '.dat'
-        verbose = True
 
     # Create directories and define working paths
     os.system('mkdir -p data/')
     os.system('mkdir -p products/')
+    if betaversion:
+        os.system('mkdir -p developers/')
 
     data_path = "data/"
     cont_path = "products/"
@@ -91,14 +92,15 @@ def process_files(iname=False,
 
     if iname or ifile:
         if cutout:
-            print("+++ Producing cutout files ...")
+            if verbose >= 1:
+                print("+++ Producing cutout files ...")
             tmp_files = []
             for file_name in input_files:
                 data_fitsfile = data_path + file_name + extension
                 central_xpixel = cutout[0]
                 central_ypixel = cutout[1]
                 number_pixels = cutout[2]
-                if verbose:
+                if verbose >= 1:
                     print("  . Cutout of %s \n    at central pixel %i, %i with size %i" % (data_fitsfile, central_xpixel, central_ypixel, number_pixels))
                 cutout_fitsfile = cutout_path + file_name + '_cutout' + extension
                 fits_cutout(data_fitsfile, central_xpixel, central_ypixel, number_pixels, cutout_fitsfile)
@@ -114,7 +116,8 @@ def process_files(iname=False,
 
     # Merge FITS files if required
     if imerge:
-        print("+++ Merging files ...")
+        if verbose >= 1:
+            print("+++ Merging files ...")
         
         merged_path = data_path + 'merged/'
         os.system('mkdir -p ' + merged_path)
@@ -124,13 +127,14 @@ def process_files(iname=False,
 
         tmp_files, tmp_path, unmerged_files, unmerged_path = fits_merge(tmp_files, tmp_path, extension, merged_file_name, merged_path)
 
-    if betaversion:
-        verbose = False
+    # For developers, turn off verbose
+    #if betaversion:
+    #    verbose = False
         
     # Loop through all the files that will be processed
     for tmp_file in tmp_files:
 
-        if betaversion is False:
+        if verbose >= 1:
             print("")
             print("+++ PROCESSING " + tmp_path + tmp_file + extension)
 
@@ -187,7 +191,7 @@ def process_files(iname=False,
             # Loop through y pixels
             for ypix in range(nypix):
 
-                if betaversion is False:
+                if verbose >= 1:
                     print("... analyzing column " + str(ypix+1) + " out of " + str(nypix))
 
                 if cmax:
@@ -219,7 +223,7 @@ def process_files(iname=False,
                     # For FITS files
                     if iname or ifile:
 
-                        if verbose:
+                        if verbose >= 3:
                             print("  . corresponding to pixel " + str(xpix+1) + "," + str(ypix+1))
 
                         # Write the intensity of a given pixel for all the channels into the array flux
@@ -258,13 +262,13 @@ def process_files(iname=False,
                         if np.isnan(np.min(flux)):
                             maximum_flux = float('nan')
 
-                            if verbose:
+                            if verbose >= 3:
                                 print("    flux of maximum      = masked")
 
                         else:
                             maximum_flux = c_max(flux, rms_noise)
 
-                            if verbose:
+                            if verbose >= 3:
                                 print("    flux of maximum      = " + str(int(maximum_flux*1.e5)/1.e5))
 
                         continuum_flux_maximum[ypix].append(maximum_flux)
@@ -275,14 +279,14 @@ def process_files(iname=False,
                         if np.isnan(np.min(flux)):
                             mean_flux = meansel_flux = float('nan')
 
-                            if verbose:
+                            if verbose >= 3:
                                 print("    flux of mean (all)   = masked")
                                 print("    flux of mean (sel)   = masked")
                         
                         else:
                             mean_flux, meansel_flux = c_mean(flux, rms_noise)
 
-                            if verbose:
+                            if verbose >= 3:
                                 print("    flux of mean (all)   = " + str(int(mean_flux*1.e5)/1.e5))
                                 print("    flux of mean (sel)   = " + str(int(meansel_flux*1.e5)/1.e5))
 
@@ -295,14 +299,14 @@ def process_files(iname=False,
                         if np.isnan(np.min(flux)):
                             median_flux = mediansel_flux = float('nan')
 
-                            if verbose:
+                            if verbose >= 3:
                                 print("    flux of median (all) = masked")
                                 print("    flux of median (sel) = masked")
                         
                         else:
                             median_flux, mediansel_flux = c_median(flux, rms_noise)
 
-                            if verbose:
+                            if verbose >= 3:
                                 print("    flux of median (all) = " + str(int(median_flux*1.e5)/1.e5))
                                 print("    flux of median (sel) = " + str(int(mediansel_flux*1.e5)/1.e5))
 
@@ -315,7 +319,7 @@ def process_files(iname=False,
                         if np.isnan(np.min(flux)):
                             percent25_flux = percent75_flux = float('nan')
 
-                            if verbose:
+                            if verbose >= 3:
                                 print("    flux of percent 25   = masked")
                                 print("    flux of percent 75   = masked")
 
@@ -323,7 +327,7 @@ def process_files(iname=False,
                             percent25_flux = c_percent(flux, percentile=25)
                             percent75_flux = c_percent(flux, percentile=75)
 
-                            if verbose:
+                            if verbose >= 3:
                                 print("    flux of percent 25   = " + str(int(percent25_flux*1.e5)/1.e5))
                                 print("    flux of percent 75   = " + str(int(percent75_flux*1.e5)/1.e5))
 
@@ -336,13 +340,18 @@ def process_files(iname=False,
                         if np.isnan(np.min(flux)):
                             KDEmax_flux = float('nan')
 
-                            if verbose:
+                            if verbose >= 3:
                                 print("    flux of KDEmax       = masked")
                             
                         else:
-                            KDEmax_flux = c_KDEmax(flux, rms_noise)
+                            KDEmax_flux = c_KDEmax(flux, rms_noise, betaversion)
+                            
+                            if betaversion:
+                                if verbose >= 1:
+                                    print(" < DEVELOPERS > ")
+                                    print(" < DEVELOPERS > ... KDE available in file developers/STATCONT_KDE_distribution.dat")
 
-                            if verbose:
+                            if verbose >= 3:
                                 print("    flux of KDEmax       = " + str(int(KDEmax_flux*1.e5)/1.e5))
 
                         continuum_flux_KDEmax[ypix].append(KDEmax_flux)
@@ -353,14 +362,14 @@ def process_files(iname=False,
                         if np.isnan(np.min(flux)):
                             Gaussian_flux = Gaussian_noise = GaussNw_flux = GaussNw_noise = float('nan')
 
-                            if verbose:
+                            if verbose >= 3:
                                 print("    flux of Gaussian     = masked")
                                 print("    flux of Gauss (sel)  = masked")
 
                         else:
                             Gaussian_flux, Gaussian_noise, GaussNw_flux, GaussNw_noise = c_Gaussian(flux, rms_noise)
 
-                            if verbose:
+                            if verbose >= 3:
                                 print("    flux of Gaussian     = " + str(int(Gaussian_flux*1.e5)/1.e5) + " +/- " + str(int(Gaussian_noise*1.e5)/1.e5))
                                 print("    flux of Gauss (sel)  = " + str(int(GaussNw_flux*1.e5)/1.e5) + " +/- " + str(int(GaussNw_noise*1.e5)/1.e5))
 
@@ -375,14 +384,21 @@ def process_files(iname=False,
                         if np.isnan(np.min(flux)):
                             sigmaclip_flux_prev = sigmaclip_flux = sigmaclip_noise = float('nan')
 
-                            if verbose:
+                            if verbose >= 3:
                                 print("    flux of sigma-clip   = masked")
                                 print("    flux of c-sigma-clip = masked")
 
                         else:
-                            sigmaclip_flux_prev, sigmaclip_flux, sigmaclip_noise, emission_v1, emission_v2, absorption_v1, absorption_v2 = c_sigmaclip(flux, rms_noise)
+                            if betaversion is False:
+                                sigmaclip_flux_prev, sigmaclip_flux, sigmaclip_noise = c_sigmaclip(flux, rms_noise, betaversion)
+                            
+                            if betaversion:
+                                sigmaclip_flux_prev, sigmaclip_flux, sigmaclip_noise, real_fraction_emission, fraction_emission, real_fraction_absorption, fraction_absorption = c_sigmaclip(flux, rms_noise, betaversion)
+                                if verbose >= 1:
+                                    print(" < DEVELOPERS > ")
+                                    print(" < DEVELOPERS > ... data and filtered data available in file developers/STATCONT_sigmaclip_filtered.dat")
 
-                            if verbose:
+                            if verbose >= 3:
                                 print("    flux of sigma-clip   = " + str(int(sigmaclip_flux_prev*1.e5)/1.e5) + " +/- " + str(int(sigmaclip_noise*1.e5)/1.e5))
                                 print("    flux of c-sigma-clip = " + str(int(sigmaclip_flux*1.e5)/1.e5) + " +/- " + str(int(sigmaclip_noise*1.e5)/1.e5))
 
@@ -393,7 +409,7 @@ def process_files(iname=False,
                     # Create plots with spectra and different continuum levels
                     if plots:
                         if np.isnan(np.min(flux)):
-                            if verbose:
+                            if verbose >= 3:
                                 print("    ... masked pixel, no plot produced")
 
                         else:
@@ -467,7 +483,7 @@ def process_files(iname=False,
                             plt.close(fig1)
 
             # Write the output continuum file
-            if betaversion is False:
+            if verbose >= 1:
                 print(" ")
                 print("... CONTINUUM FILEs CREATED: ")
 
@@ -520,13 +536,15 @@ def process_files(iname=False,
 
             if csigmaclip:
 
+                output_files.append(cont_path + tmp_file + '_continuum_sigmaclip' + extension)
+                output_fluxs.append(continuum_flux_sigmaclip_prev)
                 output_files.append(cont_path + tmp_file + '_continuum' + extension)
                 output_fluxs.append(continuum_flux_sigmaclip)
                 output_files.append(cont_path + tmp_file + '_noise' + extension)
                 output_fluxs.append(continuum_noise_sigmaclip)
 
             for output_file, output_flux in zip(output_files, output_fluxs):
-                if verbose:
+                if verbose >= 1:
                     print("  . " + output_file)
                 os.system('rm -rf ' + output_file)
                 if iname or ifile:
@@ -537,11 +555,9 @@ def process_files(iname=False,
                     np.savetxt(output_file, output_array, newline=" ")
 
             # For statistics (to be removed)
-            if betaversion:
-                print('%4.1f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f' % (rms_noise, 50, int(mean_flux*1.e5)/1.e5, int(KDEmax_flux*1.e5)/1.e5, int(Gaussian_flux*1.e5)/1.e5, int(Gaussian_noise*1.e5)/1.e5, int(GaussNw_flux*1.e5)/1.e5, int(GaussNw_noise*1.e5)/1.e5, int(sigmaclip_flux_prev*1.e5)/1.e5, int(sigmaclip_noise*1.e5)/1.e5, int(emission_v1*1.e5)/1.e5, int(absorption_v1*1.e5)/1.e5, int(emission_v2*1.e5)/1.e5, int(absorption_v2*1.e5)/1.e5) )
-                #print(rms_noise, 50, int(mean_flux*1.e5)/1.e5, int(KDEmax_flux*1.e5)/1.e5, int(Gaussian_flux*1.e5)/1.e5, int(Gaussian_noise*1.e5)/1.e5, int(GaussNw_flux*1.e5)/1.e5, int(GaussNw_noise*1.e5)/1.e5, int(sigmaclip_flux_prev*1.e5)/1.e5, int(sigmaclip_noise*1.e5)/1.e5, int(emission_v1*1.e5)/1.e5, int(absorption_v1*1.e5)/1.e5, int(emission_v2*1.e5)/1.e5, int(absorption_v2*1.e5)/1.e5 )
+            if betaversion and cmean and cKDEmax and cGaussian and csigmaclip:
+                print('%4.1f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f' % (rms_noise, 50, int(mean_flux*1.e5)/1.e5, int(KDEmax_flux*1.e5)/1.e5, int(Gaussian_flux*1.e5)/1.e5, int(Gaussian_noise*1.e5)/1.e5, int(GaussNw_flux*1.e5)/1.e5, int(GaussNw_noise*1.e5)/1.e5, int(sigmaclip_flux_prev*1.e5)/1.e5, int(sigmaclip_noise*1.e5)/1.e5, int(real_fraction_emission*1.e5)/1.e5, int(real_fraction_absorption*1.e5)/1.e5, int(fraction_emission*1.e5)/1.e5, int(fraction_absorption*1.e5)/1.e5) )
                 
-
     if continuum:
         
         # Re-set the variables to individual files if --imerge is used
@@ -560,15 +576,17 @@ def process_files(iname=False,
 
                 os.system('cp -rp ' + merged_continuum_file + ' ' + cont_path + tmp_file + '_continuum' + extension)
                 os.system('cp -rp ' + merged_noise_file + ' ' + cont_path + tmp_file + '_noise' + extension)
-                print("  . " + cont_path + tmp_file + '_continuum' + extension)
-                print("  . " + cont_path + tmp_file + '_noise' + extension)
+                if verbose >= 1:
+                    print("  . " + cont_path + tmp_file + '_continuum' + extension)
+                    print("  . " + cont_path + tmp_file + '_noise' + extension)
 
             # Subtract continuum to the original (line+continuum) data file
             # and produce a line-only and a continuum-only file
             if cfree is True:
 
-                print("")
-                print("+++ REMOVING CONTINUUM FROM DATA ... " + tmp_path + tmp_file + extension)
+                if verbose >= 1:
+                    print("")
+                    print("+++ REMOVING CONTINUUM FROM DATA ... " + tmp_path + tmp_file + extension)
 
                 # Select the original line+continuum file and the created continuum file
                 cube_file = tmp_path + tmp_file + extension
@@ -589,9 +607,10 @@ def process_files(iname=False,
                         line_outfile = line_path + cont_file + '.line' + extension
                         ascii.write((freqs, flux[:]-data_cont), output=line_outfile)
 
-                        print(" ")
-                        print("... FILEs CREATED: ")
-                        print("  . " + line_outfile)
+                        if verbose >1:
+                            print(" ")
+                            print("... FILEs CREATED: ")
+                            print("  . " + line_outfile)
 
                     # For FITS files
                     if iname or ifile:
@@ -604,7 +623,8 @@ def process_files(iname=False,
                         # If --nooffset is selected, try to remove the offset from the map
                         if nooffset:
                             
-                            print("... removing general continuum offset")
+                            if verbose >= 1:
+                                print("... removing general continuum offset")
                             nxpix = header_cube.get('NAXIS1')
                             nypix = header_cube.get('NAXIS2')
                             rmsxpix = int(nxpix / 8)
@@ -636,7 +656,8 @@ def process_files(iname=False,
                                 rms.append(np.mean(data_cont[rmsypix*6:rmsypix*7,rmsxpix*5:rmsxpix*6]))
                                 rms.append(np.mean(data_cont[rmsypix*6:rmsypix*7,rmsxpix*6:rmsxpix*7]))
 
-                                print("  . correcting the continuum by %f " % (np.absolute(np.median(rms))))
+                                if verbose >= 1:
+                                    print("  . correcting the continuum by %f " % (np.absolute(np.median(rms))))
                                 data_finalcont = data_cont - np.median(rms)
                                 data_line = data_cube - (data_cont - np.median(rms))
                                 #data_finalcont = data_cont + np.absolute(np.median(rms))
@@ -645,9 +666,10 @@ def process_files(iname=False,
                             # If the size of the map is too small (less than 30x30 pixels)
                             # no rms noise level is subtracted
                             else:
-                                print("  . WARNING: The image has less than %i x %i pixels" % (nxpixmin, nypixmin))
-                                print("  .          No residual noise level subtracted for")
-                                print("  .          %s " % (cube_file))
+                                if verbose >= 1:
+                                    print("  . WARNING: The image has less than %i x %i pixels" % (nxpixmin, nypixmin))
+                                    print("  .          No residual noise level subtracted for")
+                                    print("  .          %s " % (cube_file))
                                 
                                 data_finalcont = data_cont
                                 data_line = data_cube - data_cont
@@ -672,19 +694,23 @@ def process_files(iname=False,
                         os.system('mv ' + cont_outfile + ' ' + cont_path + cont_file + extension)
                         os.system('mv ' + line_outfile + ' ' + cont_path + tmp_file + '_line' + extension)
 
-                        print(" ")
-                        print("... FILEs CREATED: ")
+                        if verbose >= 1:
+                            print(" ")
+                            print("... FILEs CREATED: ")
                         if nooffset:
-                            print("  . " + cont_path + tmp_file + '_continuum' + extension)
-                            print("  . " + cont_path + tmp_file + '_noise' + extension)
-                        print("  . " + cont_path + tmp_file + '_line' + extension)
+                            if verbose >= 1:
+                                print("  . " + cont_path + tmp_file + '_continuum' + extension)
+                                print("  . " + cont_path + tmp_file + '_noise' + extension)
+                        if verbose >= 1:
+                            print("  . " + cont_path + tmp_file + '_line' + extension)
 
     # Combine several continuum files to determine the spectral index
     # it also combines them and creates a continuum model, and line+continuum model
     if spindex:
 
-        print(" ")
-        print("+++ DETERMINING SPECTRAL INDEX ...")
+        if verbose >= 1:
+            print(" ")
+            print("+++ DETERMINING SPECTRAL INDEX ...")
 
         # Combine all the continuum images in one single cube
         if extension=='.dat':
@@ -750,7 +776,7 @@ def process_files(iname=False,
 
             for ypix in range(nypix):
 
-                if betaversion is False:
+                if verbose >= 1:
                     print("... analyzing column " + str(ypix+1) + " out of " + str(nypix))
 
                 m.append([])
@@ -774,23 +800,24 @@ def process_files(iname=False,
             fits.writeto(cont_n_file, np.float32(n), header=header, clobber=True)
 
         # Indicate where the created files can be found
-        print("... FILEs CREATED are found in " + cont_path)
-        print("  . search for spindex and intercept")
-        print(" ")
+        if verbose >= 1:
+            print("... FILEs CREATED are found in " + cont_path)
+            print("  . search for spindex and intercept")
+            print(" ")
 
         # Create a continuum model (from the spectral index)
         # and a line+continuum cube, using the continuum model
         if model:
 
-            print(" ")
-            print("+++ PRODUCING MODEL USING THE SPECTRAL INDEX ...")
+            if verbose >= 1:
+                print(" ")
+                print("+++ PRODUCING MODEL USING THE SPECTRAL INDEX ...")
             
             if extension=='.dat':
                 
                 for tmp_file in tmp_files:
                     
                     # Create a frequency array from the original data cube
-                    #print("HOLAAA")
                     f = open(cont_path + tmp_file + '_continuum' + extension)
                     for line in f:
                         print(float(line.split()[1]))
@@ -817,7 +844,8 @@ def process_files(iname=False,
                     cont_real = fits.getdata(cont_path + tmp_file + '_continuum.fits')
 
                     # Generate the continuum model (using the n, m parameters)
-                    print("... creating continuum model of " + tmp_file)
+                    if verbose >= 1:
+                        print("... creating continuum model of " + tmp_file)
                     cont_model = np.power(10, n_data[np.newaxis, :, :] + (np.log10(frequency_array[:,np.newaxis, np.newaxis]) * m_data[np.newaxis, :, :]))
                     cont_model_file = cont_path + tmp_file + '_cont_model' + extension
                     os.system('rm -rf ' + cont_model_file)
@@ -833,7 +861,8 @@ def process_files(iname=False,
                     fits.writeto(factor_file, np.float32(factor), header=cube_header, clobber=True)
 
                     # Compute the line and continuum model
-                    print("... creating the line+continuum model of " + tmp_file)
+                    if verbose >= 1:
+                        print("... creating the line+continuum model of " + tmp_file)
                     line_cont_model = cube_data[:, :, :, :] * factor[np.newaxis, :, :, :]
                     line_cont_model[factor < -1.0e7] = cube_data[:, :, :, :] + cont_model[np.newaxis, :, :, :]
                     line_cont_model_file = cont_path + tmp_file + '_line_cont_model' + extension
@@ -847,9 +876,10 @@ def process_files(iname=False,
                     fits.writeto(line_model_file, np.float32(line_model), header=cube_header, clobber=True)
 
             # Indicate where the created files can be found
-            print("... FILEs CREATED are found in " + cont_path)
-            print("  . search for cont_model and line_cont_model")
-            print(" ")
+            if verbose >= 1:
+                print("... FILEs CREATED are found in " + cont_path)
+                print("  . search for cont_model and line_cont_model")
+                print(" ")
         
         # Delete the temporal ASCII file
         os.system('rm ' + cont_path + 'tmp_merged_continuum' + extension)

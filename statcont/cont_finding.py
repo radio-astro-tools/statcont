@@ -265,6 +265,7 @@ def c_sigmaclip(flux, rms_noise, betaversion, sigma_clip_threshold=1.8):
     fraction_absorption = 100*fraction_absorption/len(flux)
 
     # Apply correction to continuum level
+    # see details in Sect. 2.4 of Sanchez-Monge et al. (2017)
     if (fraction_emission < 33 and fraction_absorption < 33):
         sigmaclip_flux = sigmaclip_flux_prev
     elif (fraction_emission >= 33 and fraction_absorption < 33):

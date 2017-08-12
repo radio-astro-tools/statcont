@@ -23,7 +23,7 @@ def main(args=None):
 
     # Creating the list of options
     pars = argparse.ArgumentParser(description="+++ ----------------------------------------------------------------------- \
-                                                +++ STATCONT : A statistical continuum level determination method (v 1.1)")
+                                                +++ STATCONT : A statistical continuum level determination method (v 1.1) ")
     grou = pars.add_mutually_exclusive_group()
     grou.add_argument('-i', '--iname', nargs='*',
                       help='NECESSARY: unless parameters -f or -s are considered. \

@@ -5,7 +5,7 @@ from .cont_finding import *
 
 import os
 import math
-#import numpy as np
+import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import gridspec
 import astropy

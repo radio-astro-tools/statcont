@@ -211,10 +211,11 @@ def c_Gaussian(flux, rms_noise):
     return Gaussian_flux, Gaussian_noise, GaussNw_flux, GaussNw_noise
 
 ##======================================================================
-def c_sigmaclip(flux, rms_noise, betaversion, sigma_clip_threshold=1.8):
+def c_sigmaclip1D(flux, rms_noise, betaversion, sigma_clip_threshold=1.8):
     """
     Perform sigma-clipping to determine the mean flux level, with different
     adaptations for emission- and absorption-dominated spectra
+    It runs on one-dimensional arrays
 
     Parameters
     ----------
@@ -312,6 +313,79 @@ def c_sigmaclip(flux, rms_noise, betaversion, sigma_clip_threshold=1.8):
     ### For ABSORPTION-dominated spectra
     ##elif (mean_flux-sigmaclip_flux_prev) < (-1.0*rms_noise):
     ##    sigmaclip_flux = sigmaclip_flux_prev + sigmaclip_sigma
+
+##======================================================================
+def c_sigmaclip(flux, rms_noise, freq_axis, sigma_clip_threshold=1.8):
+    """
+    Perform sigma-clipping to determine the mean flux level, with different
+    adaptations for emission- and absorption-dominated spectra
+    Different to c_sigmaclip1D function, it works directly on arrays
+    It speeds up the process of continuum determination
+
+    Parameters
+    ----------
+    flux : np.ndarray
+        Multi-dimension array of flux values
+    rms_noise : float
+        The estimated RMS noise level of the data
+    freq_axis : integer
+        Python-based dimension for the frequency (usually 0 or 1)
+    sigma_clip_threshold : float
+        The threshold in number of sigma above/below which to reject outlier
+        data
+
+    Returns
+    -------
+    sigmaclip_flux_prev : np.ndarray
+    sigmaclip_flux : np.ndarray
+    sigmaclip_noise : np.ndarray
+        The measured continuum flux and estimated 1-sigma per-channel noise
+        around that measurement
+        The variable sigmaclip_flux_prev contains the continuum determined
+        with the sigma-clipping method without applying the correction
+        of STATCONT
+    """
+
+    # Sigma-clipping method applied to the flux array
+    filtered_data = astropy.stats.sigma_clip(flux, sigma=sigma_clip_threshold, iters=None, axis=freq_axis)
+
+    sigmaclip_flux_prev = sigmaclip_flux = np.mean(filtered_data, axis=freq_axis)
+    sigmaclip_noise = sigmaclip_sigma = np.std(filtered_data, axis=freq_axis)
+    mean_flux = np.mean(flux)
+
+    # Correction of sigma-clip continuum level, making use of the
+    # presence of emission and/or absorption line features
+
+    # Set up the fraction of channels (in %) that are in emission
+    fraction_emission = sum(i > (sigmaclip_flux+1*rms_noise) for i in flux)
+    fraction_emission = 100*fraction_emission/len(flux)
+
+    # Set up the fraction of channels (in %) that are in absorption
+    fraction_absorption = sum(i < (sigmaclip_flux-1*rms_noise) for i in flux)
+    fraction_absorption = 100*fraction_absorption/len(flux)
+
+    # Apply correction to continuum level
+    # see details in Sect. 2.4 of Sanchez-Monge et al. (2017)
+    sigmaclip_flux_case1 = np.where((fraction_emission < 33) & (fraction_absorption < 33), sigmaclip_flux_prev, 0.0)
+    sigmaclip_flux_case2 = np.where((fraction_emission >= 33) & (fraction_absorption < 33) & (fraction_emission-fraction_absorption > 25.0), sigmaclip_flux_prev - 1.0*sigmaclip_sigma, 0.0)
+    sigmaclip_flux_case3 = np.where((fraction_emission >= 33) & (fraction_absorption < 33) & (fraction_emission-fraction_absorption <= 25.0), sigmaclip_flux_prev - 0.5*sigmaclip_sigma, 0.0)
+    sigmaclip_flux_case4 = np.where((fraction_emission < 33) & (fraction_absorption >= 33) & (fraction_emission-fraction_absorption > 25.0), sigmaclip_flux_prev + 1.0*sigmaclip_sigma, 0.0)
+    sigmaclip_flux_case5 = np.where((fraction_emission < 33) & (fraction_absorption >= 33) & (fraction_emission-fraction_absorption <= 25.0), sigmaclip_flux_prev + 0.5*sigmaclip_sigma, 0.0)
+    sigmaclip_flux_case6 = np.where((fraction_emission >= 33) & (fraction_absorption >= 33) & (fraction_emission-fraction_absorption > 25.0), sigmaclip_flux_prev - 1.0*sigmaclip_sigma, 0.0)
+    sigmaclip_flux_case7 = np.where((fraction_emission >= 33) & (fraction_absorption >= 33) & (fraction_absorption-fraction_emission > 25.0), sigmaclip_flux_prev + 1.0*sigmaclip_sigma, 0.0)
+    sigmaclip_flux_case8 = np.where((fraction_emission >= 33) & (fraction_absorption >= 33) & (abs(fraction_absorption-fraction_emission) <= 25.0), sigmaclip_flux_prev, 0.0)
+
+    sigmaclip_flux = sigmaclip_flux_case1 + sigmaclip_flux_case2 + sigmaclip_flux_case3 + sigmaclip_flux_case4 + sigmaclip_flux_case5 + sigmaclip_flux_case6 + sigmaclip_flux_case7 + sigmaclip_flux_case8
+
+    # Remove masked values if any
+    if isinstance(sigmaclip_flux_prev, np.ma.MaskedArray):
+        sigmaclip_flux_prev = sigmaclip_flux_prev.filled()
+    if isinstance(sigmaclip_flux, np.ma.MaskedArray):
+        sigmaclip_flux = sigmaclip_flux.filled()
+    if isinstance(sigmaclip_noise, np.ma.MaskedArray):
+        sigmaclip_noise = sigmaclip_noise.filled()
+
+    return sigmaclip_flux_prev, sigmaclip_flux, sigmaclip_noise
 
 ##======================================================================
 def cont_histo(flux, rms_noise):

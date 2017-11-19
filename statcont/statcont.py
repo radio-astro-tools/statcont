@@ -48,7 +48,7 @@ def main(args=None):
                       help='NECESSARY: RMS noise level of the observataions')
     pars.add_argument('--continuum', action='store_true',
                       help='OPTIONAL: Determination of the continuum (and noise) \
-                            Method SIGMACLIP (--csigmaclip) is used by default\
+                            Method corrected SIGMACLIP (fast) is used by default\
                             Subtraction of continuum to line data (--cfree)')
     pars.add_argument('--cmax', action='store_true',
                       help='OPTIONAL: Continuum from the MAXIMUM of the histogram')
@@ -122,21 +122,17 @@ def main(args=None):
         op.cGaussian = True
         op.csigmaclip = True
 
-    # Use SIGMA-CLIPPING to obtain a value to compare with when using other methods
-    if op.cmax or op.cmean or op.cmedian or op.cpercent or op.cKDEmax or op.cGaussian:
-        op.csigmaclip = True
-
-    # Use the SIGMA-CLIPPING method and subtract continuum to line, if --continuum is used
-    if op.continuum:
-        op.csigmaclip = True
-        op.cfree = True
-
     # Activate the main code for continuum determination when using any method
     if op.cmax or op.cmean or op.cmedian or op.cpercent or op.cKDEmax or op.cGaussian or op.csigmaclip:
         op.continuum = True
 
+    # Use the SIGMA-CLIPPING method and subtract continuum to line, if --continuum is used
+    if op.continuum:
+        op.cfree = True
+
     # Activate the subtraction of the continuum --cfree, if the general offset wants to be removed
     if op.nooffset:
+        op.continuum = True
         op.cfree = True
 
     # Activate the determination of the spectral index --spindex, if the model wants to be created
@@ -166,5 +162,4 @@ def main(args=None):
                   model=op.model,
                   plots=op.plots,
                   cutout=op.cutout,
-                  verbose=verbose,
-                  betaversion=op.betaversion)
+                  verbose=verbose)

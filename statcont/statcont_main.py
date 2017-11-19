@@ -168,17 +168,17 @@ def process_files(iname=False,
 
             # Message informing about required computational time
             # an image of 512 x 512 pixels my require about 1 hour
-            requested_time = (nxpix*nypix)/(512.*512.)
+            # We have run a sample of examples to derive the following relation with time:
+            #   log(time) = a * log(nxpix*nypix*nchan) + b
+            # where time is in minutes, and a and b are given below
+            time_a = +1.16215
+            time_b = -7.43412
+            requested_time = 10.**(time_a+np.log10(nxpix*nypix*nchan)+time_b) # in minutes
+            requested_time = requested_time/60. # in hours
             
-            if requested_time > 1.:
-                requested_time = int(100.*requested_time)/100.
-                print("  . your image has " + str(nxpix) + "x" + str(nypix) + " pixels, it may take " + str(requested_time) + " hours")
-            if requested_time < 1.:
-                requested_time = int(100*(requested_time*60.))/100.
-                print("  . your image has " + str(nxpix) + "x" + str(nypix) + " pixels, it may take " + str(requested_time) + " minutes")
-            
-            print("  . current time is     " + str(datetime.datetime.now()))
-            print("  . estimated ending    " + str(datetime.datetime.now()+datetime.timedelta(hours=(nxpix*nypix)/(512.*512.))))
+            print("  . your image has " + str(nxpix) + "x" + str(nypix) + " pixels, and " + str(nchan) + " channels")
+            print("  . current time is        " + str(datetime.datetime.now()))
+            print("  . estimated ending       " + str(datetime.datetime.now()+datetime.timedelta(hours=requested_time)))
             
             # Fast determination of the continuum level using corrected SIGMA-CLIP on arrays
             
@@ -221,6 +221,9 @@ def process_files(iname=False,
             sigmaclip_flux_prev, sigmaclip_flux, sigmaclip_noise = c_sigmaclip(flux, rms_noise, freq_axis)
             continuum_flux = sigmaclip_flux
             continuum_noise = sigmaclip_noise
+
+            # Write final time to compare with prediction
+            print("  . continuum estimated on " + str(datetime.datetime.now()))
             
             if verbose >= 3:
                 print("    flux of continuum    = " + str(int(sigmaclip_flux*1.e5)/1.e5) + " +/- " + str(int(sigmaclip_noise*1.e5)/1.e5))

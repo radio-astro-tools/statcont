@@ -171,8 +171,8 @@ def process_files(iname=False,
             # We have run a sample of examples to derive the following relation with time:
             #   log(time) = a * log(nxpix*nypix*nchan) + b
             # where time is in minutes, and a and b are given below
-            time_a = +1.16215
-            time_b = -7.43412
+            time_a = +1.14
+            time_b = -7.30
             requested_time = 10.**(time_a+np.log10(nxpix*nypix*nchan)+time_b) # in minutes
             requested_time = requested_time/60. # in hours
             

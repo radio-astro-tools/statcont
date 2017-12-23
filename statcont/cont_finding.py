@@ -356,13 +356,27 @@ def c_sigmaclip(flux, rms_noise, freq_axis, sigma_clip_threshold=1.8):
     # Correction of sigma-clip continuum level, making use of the
     # presence of emission and/or absorption line features
 
-    # Set up the fraction of channels (in %) that are in emission
-    fraction_emission = sum(i > (sigmaclip_flux+1*rms_noise) for i in flux[0,:,:,:])
-    fraction_emission = 100*fraction_emission/len(flux[0,:,0,0])
-
-    # Set up the fraction of channels (in %) that are in absorption
-    fraction_absorption = sum(i < (sigmaclip_flux-1*rms_noise) for i in flux[0,:,:,:])
-    fraction_absorption = 100*fraction_absorption/len(flux[0,:,0,0])
+    naxis = len(flux.shape)
+    
+    if naxis == 4:
+        
+        # Set up the fraction of channels (in %) that are in emission
+        fraction_emission = sum(i > (sigmaclip_flux+1*rms_noise) for i in flux[0, :, :, :])
+        fraction_emission = 100*fraction_emission/len(flux[0, :, 0, 0])
+        
+        # Set up the fraction of channels (in %) that are in absorption
+        fraction_absorption = sum(i < (sigmaclip_flux-1*rms_noise) for i in flux[0, :, :, :])
+        fraction_absorption = 100*fraction_absorption/len(flux[0, :, 0, 0])
+    
+    if naxis == 3:
+        
+        # Set up the fraction of channels (in %) that are in emission
+        fraction_emission = sum(i > (sigmaclip_flux+1*rms_noise) for i in flux[:, :, :])
+        fraction_emission = 100*fraction_emission/len(flux[:, 0, 0])
+        
+        # Set up the fraction of channels (in %) that are in absorption
+        fraction_absorption = sum(i < (sigmaclip_flux-1*rms_noise) for i in flux[:, :, :])
+        fraction_absorption = 100*fraction_absorption/len(flux[:, 0, 0])
     
     # Apply correction to continuum level
     # see details in Sect. 2.4 of Sanchez-Monge et al. (2017)

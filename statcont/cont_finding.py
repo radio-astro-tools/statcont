@@ -377,6 +377,16 @@ def c_sigmaclip(flux, rms_noise, freq_axis, sigma_clip_threshold=1.8):
         # Set up the fraction of channels (in %) that are in absorption
         fraction_absorption = sum(i < (sigmaclip_flux-1*rms_noise) for i in flux[:, :, :])
         fraction_absorption = 100*fraction_absorption/len(flux[:, 0, 0])
+
+    if naxis == 1:
+        
+        # Set up the fraction of channels (in %) that are in emission
+        fraction_emission = sum(i > (sigmaclip_flux+1*rms_noise) for i in flux[:])
+        fraction_emission = 100*fraction_emission/len(flux[:])
+        
+        # Set up the fraction of channels (in %) that are in absorption
+        fraction_absorption = sum(i < (sigmaclip_flux-1*rms_noise) for i in flux[:])
+        fraction_absorption = 100*fraction_absorption/len(flux[:])
     
     # Apply correction to continuum level
     # see details in Sect. 2.4 of Sanchez-Monge et al. (2017)

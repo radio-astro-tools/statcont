@@ -268,7 +268,7 @@ def process_files(iname=False,
                 continuum_flux_sigmaclip = []
                 continuum_noise_sigmaclip = []
 
-            if cmax or cmean or cmedian or cpercent or cKDEmax or cGaussian or csigmaclip:
+            if cmax or cmean or cmedian or cpercent or cKDEmax or cGaussian or csigmaclip or plots:
                 
                 # Loop through y pixels
                 for ypix in range(nypix):
@@ -512,14 +512,14 @@ def process_files(iname=False,
                                 plt.ylim(flux.min(), flux.max())
                                 ax1.set_title('Spectrum and continuum level at pixel (' + str(xpix+1) + ',' + str(ypix+1) + ')')
                                 if cmax:
-                                    ax2.axhline(y=maximum_flux, linestyle='--', color='green', linewidth='1.5')
+                                    ax2.axhline(y=maximum_flux, linestyle='--', color='green', linewidth=1.5)
                                     if iname or ifile:
                                         ax1.text(0.0, 0.9, "Maximum = " + str(int(maximum_flux*1.e5)/1.e5) + " " + bunit)
                                     if ispec:
                                         ax1.text(0.0, 0.8, "Maximum = " + str(int(maximum_flux*1.e5)/1.e5))
                                 if cmean:
-                                    ax2.axhline(y=mean_flux, linestyle='--', color='orange', linewidth='1.5')
-                                    ax2.axhline(y=meansel_flux, linestyle='--', color='yellow', linewidth='1.5')
+                                    ax2.axhline(y=mean_flux, linestyle='--', color='orange', linewidth=1.5)
+                                    ax2.axhline(y=meansel_flux, linestyle='--', color='yellow', linewidth=1.5)
                                     if iname or ifile:
                                         ax1.text(0.0, 0.6, "Mean = " + str(int(mean_flux*1.e5)/1.e5) + " " + bunit)
                                         ax1.text(0.0, 0.4, "Mean (sel.) = " + str(int(meansel_flux*1.e5)/1.e5) + " " + bunit)
@@ -527,8 +527,8 @@ def process_files(iname=False,
                                         ax1.text(0.0, 0.6, "Mean = " + str(int(mean_flux*1.e5)/1.e5))
                                         ax1.text(0.0, 0.4, "Mean (sel.) = " + str(int(meansel_flux*1.e5)/1.e5))
                                 if cmedian:
-                                    ax2.axhline(y=median_flux, linestyle='--', color='orange', linewidth='1.5')
-                                    ax2.axhline(y=mediansel_flux, linestyle='--', color='yellow', linewidth='1.5')
+                                    ax2.axhline(y=median_flux, linestyle='--', color='orange', linewidth=1.5)
+                                    ax2.axhline(y=mediansel_flux, linestyle='--', color='yellow', linewidth=1.5)
                                     if iname or ifile:
                                         ax1.text(0.0, 0.2, "Median = " + str(int(median_flux*1.e5)/1.e5) + " " + bunit)
                                         ax1.text(0.0, 0.0, "Median (sel.) = " + str(int(mediansel_flux*1.e5)/1.e5) + " " + bunit)
@@ -536,29 +536,29 @@ def process_files(iname=False,
                                         ax1.text(0.0, 0.2, "Median = " + str(int(median_flux*1.e5)/1.e5))
                                         ax1.text(0.0, 0.0, "Median (sel.) = " + str(int(mediansel_flux*1.e5)/1.e5))
                                 if cpercent:
-                                    ax2.axhline(y=percent25_flux, linestyle='--', color='red', linewidth='1.5')
-                                    ax2.axhline(y=percent75_flux, linestyle='--', color='red', linewidth='1.5')
+                                    ax2.axhline(y=percent25_flux, linestyle='--', color='red', linewidth=1.5)
+                                    ax2.axhline(y=percent75_flux, linestyle='--', color='red', linewidth=1.5)
                                     if iname or ifile:
                                         ax1.text(0.4, 0.8, "Percent 25th = " + str(int(percent25_flux*1.e5)/1.e5) + " " + bunit)
                                     if ispec:
                                         ax1.text(0.4, 0.8, "Percent 25th = " + str(int(percent25_flux*1.e5)/1.e5))
                                 if cKDEmax:
-                                    ax2.axhline(y=KDEmax_flux, linestyle='-', color='black', linewidth='1.5')
+                                    ax2.axhline(y=KDEmax_flux, linestyle='-', color='black', linewidth=1.5)
                                     if iname or ifile:
                                         ax1.text(0.4, 0.6, "KDE max = " + str(int(KDEmax_flux*1.e5)/1.e5) + " " + bunit)
                                     if ispec:
                                         ax1.text(0.4, 0.6, "KDE max = " + str(int(KDEmax_flux*1.e5)/1.e5))
                                 if cGaussian:
-                                    ax2.axhline(y=Gaussian_flux, linestyle='-', color='blue', linewidth='3.0', alpha=0.5)
-                                    ax2.axhline(y=GaussNw_flux, linestyle='-', color='cyan', linewidth='3.0', alpha=0.5)
+                                    ax2.axhline(y=Gaussian_flux, linestyle='-', color='blue', linewidth=3.0, alpha=0.5)
+                                    ax2.axhline(y=GaussNw_flux, linestyle='-', color='cyan', linewidth=3.0, alpha=0.5)
                                     if iname or ifile:
                                         ax1.text(0.4, 0.4, "Gaussian = " + str(int(Gaussian_flux*1.e5)/1.e5) + " " + bunit + " (+/- " + str(int(Gaussian_noise*1.e5)/1.e5) + ")")
                                         ax1.text(0.4, 0.2, "Gaussian (sel.) = " + str(int(GaussNw_flux*1.e5)/1.e5) + " " + bunit + " (+/- " + str(int(GaussNw_noise*1.e5)/1.e5) + ")")
                                     if ispec:
                                         ax1.text(0.4, 0.4, "Gaussian = " + str(int(Gaussian_flux*1.e5)/1.e5) + " (+/- " + str(int(Gaussian_noise*1.e5)/1.e5) + ")")
                                         ax1.text(0.4, 0.2, "Gaussian (sel.) = " + str(int(GaussNw_flux*1.e5)/1.e5) + " (+/- " + str(int(GaussNw_noise*1.e5)/1.e5) + ")")
-                                if csigmaclip:
-                                    ax2.axhline(y=sigmaclip_flux, linestyle='-', color='red', linewidth='1.5')
+                                if csigmaclip or continuum:
+                                    ax2.axhline(y=sigmaclip_flux, linestyle='-', color='red', linewidth=1.5)
                                     if iname or ifile:
                                         ax1.text(0.4, 0.0, "corrSigma-clip = " + str(int(sigmaclip_flux*1.e5)/1.e5) + " " + bunit + " (+/- " + str(int(sigmaclip_noise*1.e5)/1.e5) + ")")
                                     if ispec:

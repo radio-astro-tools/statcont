@@ -359,6 +359,7 @@ def c_sigmaclip(flux, rms_noise, freq_axis, sigma_clip_threshold=1.8):
 
     naxis = len(flux.shape)
     
+    # Handle different shapes; Stokes cube, cube, and single spectra
     if naxis == 4:
 
         view1 = [0, slice(None), slice(None), slice(None)]
@@ -372,10 +373,14 @@ def c_sigmaclip(flux, rms_noise, freq_axis, sigma_clip_threshold=1.8):
         view1 = [slice(None)]
         
     # Set up the fraction of channels (in %) that are in emission
-    fraction_emission = 100 * (flux[view1] > (sigmaclip_flux+1*rms_noise)).sum(axis=0) / flux[view1].shape[0]
+    fraction_emission = (100 * (flux[view1] >
+                                (sigmaclip_flux+1*rms_noise)).sum(axis=0) /
+                         flux[view1].shape[0])
     
     # Set up the fraction of channels (in %) that are in absorption
-    fraction_absorption = 100 * (flux[view1] < (sigmaclip_flux-1*rms_noise)).sum(axis=0) / flux[view1].shape[0]
+    fraction_absorption = (100 * (flux[view1] <
+                                  (sigmaclip_flux-1*rms_noise)).sum(axis=0) /
+                           flux[view1].shape[0])
     
     # Apply correction to continuum level
     # see details in Sect. 2.4 of Sanchez-Monge et al. (2017)

@@ -347,7 +347,8 @@ def c_sigmaclip(flux, rms_noise, freq_axis, sigma_clip_threshold=1.8):
     """
 
     # Sigma-clipping method applied to the flux array
-    filtered_data = astropy.stats.sigma_clip(flux, sigma=sigma_clip_threshold, iters=None, axis=freq_axis)
+    filtered_data = astropy.stats.sigma_clip(flux, sigma=sigma_clip_threshold,
+                                             iters=None, axis=freq_axis)
 
     sigmaclip_flux_prev = sigmaclip_flux = np.mean(filtered_data, axis=freq_axis)
     sigmaclip_noise = sigmaclip_sigma = np.std(filtered_data, axis=freq_axis)
@@ -358,48 +359,73 @@ def c_sigmaclip(flux, rms_noise, freq_axis, sigma_clip_threshold=1.8):
 
     naxis = len(flux.shape)
     
+    # Handle different shapes; Stokes cube, cube, and single spectra
     if naxis == 4:
-        
-        # Set up the fraction of channels (in %) that are in emission
-        fraction_emission = sum(i > (sigmaclip_flux+1*rms_noise) for i in flux[0, :, :, :])
-        fraction_emission = 100*fraction_emission/len(flux[0, :, 0, 0])
-        
-        # Set up the fraction of channels (in %) that are in absorption
-        fraction_absorption = sum(i < (sigmaclip_flux-1*rms_noise) for i in flux[0, :, :, :])
-        fraction_absorption = 100*fraction_absorption/len(flux[0, :, 0, 0])
+
+        view1 = [0, slice(None), slice(None), slice(None)]
     
     if naxis == 3:
-        
-        # Set up the fraction of channels (in %) that are in emission
-        fraction_emission = sum(i > (sigmaclip_flux+1*rms_noise) for i in flux[:, :, :])
-        fraction_emission = 100*fraction_emission/len(flux[:, 0, 0])
-        
-        # Set up the fraction of channels (in %) that are in absorption
-        fraction_absorption = sum(i < (sigmaclip_flux-1*rms_noise) for i in flux[:, :, :])
-        fraction_absorption = 100*fraction_absorption/len(flux[:, 0, 0])
 
+        view1 = [slice(None), slice(None), slice(None)]
+        
     if naxis == 1:
+
+        view1 = [slice(None)]
         
-        # Set up the fraction of channels (in %) that are in emission
-        fraction_emission = sum(i > (sigmaclip_flux+1*rms_noise) for i in flux[:])
-        fraction_emission = 100*fraction_emission/len(flux[:])
-        
-        # Set up the fraction of channels (in %) that are in absorption
-        fraction_absorption = sum(i < (sigmaclip_flux-1*rms_noise) for i in flux[:])
-        fraction_absorption = 100*fraction_absorption/len(flux[:])
+    # Set up the fraction of channels (in %) that are in emission
+    fraction_emission = (100 * (flux[view1] >
+                                (sigmaclip_flux+1*rms_noise)).sum(axis=0) /
+                         flux[view1].shape[0])
+    
+    # Set up the fraction of channels (in %) that are in absorption
+    fraction_absorption = (100 * (flux[view1] <
+                                  (sigmaclip_flux-1*rms_noise)).sum(axis=0) /
+                           flux[view1].shape[0])
     
     # Apply correction to continuum level
     # see details in Sect. 2.4 of Sanchez-Monge et al. (2017)
-    sigmaclip_flux_case1 = np.where((fraction_emission < 33) & (fraction_absorption < 33), sigmaclip_flux_prev, 0.0)
-    sigmaclip_flux_case2 = np.where((fraction_emission >= 33) & (fraction_absorption < 33) & (fraction_emission-fraction_absorption > 25.0), sigmaclip_flux_prev - 1.0*sigmaclip_sigma, 0.0)
-    sigmaclip_flux_case3 = np.where((fraction_emission >= 33) & (fraction_absorption < 33) & (fraction_emission-fraction_absorption <= 25.0), sigmaclip_flux_prev - 0.5*sigmaclip_sigma, 0.0)
-    sigmaclip_flux_case4 = np.where((fraction_emission < 33) & (fraction_absorption >= 33) & (fraction_emission-fraction_absorption > 25.0), sigmaclip_flux_prev + 1.0*sigmaclip_sigma, 0.0)
-    sigmaclip_flux_case5 = np.where((fraction_emission < 33) & (fraction_absorption >= 33) & (fraction_emission-fraction_absorption <= 25.0), sigmaclip_flux_prev + 0.5*sigmaclip_sigma, 0.0)
-    sigmaclip_flux_case6 = np.where((fraction_emission >= 33) & (fraction_absorption >= 33) & (fraction_emission-fraction_absorption > 25.0), sigmaclip_flux_prev - 1.0*sigmaclip_sigma, 0.0)
-    sigmaclip_flux_case7 = np.where((fraction_emission >= 33) & (fraction_absorption >= 33) & (fraction_absorption-fraction_emission > 25.0), sigmaclip_flux_prev + 1.0*sigmaclip_sigma, 0.0)
-    sigmaclip_flux_case8 = np.where((fraction_emission >= 33) & (fraction_absorption >= 33) & (abs(fraction_absorption-fraction_emission) <= 25.0), sigmaclip_flux_prev, 0.0)
+    sigmaclip_flux_case1 = np.where((fraction_emission < 33) &
+                                    (fraction_absorption < 33),
+                                    sigmaclip_flux_prev, 0.0)
+    sigmaclip_flux_case2 = np.where((fraction_emission >= 33) &
+                                    (fraction_absorption < 33) &
+                                    (fraction_emission-fraction_absorption >
+                                     25.0), sigmaclip_flux_prev -
+                                    1.0*sigmaclip_sigma, 0.0)
+    sigmaclip_flux_case3 = np.where((fraction_emission >= 33) &
+                                    (fraction_absorption < 33) &
+                                    (fraction_emission-fraction_absorption <=
+                                     25.0), sigmaclip_flux_prev -
+                                    0.5*sigmaclip_sigma, 0.0)
+    sigmaclip_flux_case4 = np.where((fraction_emission < 33) &
+                                    (fraction_absorption >= 33) &
+                                    (fraction_emission-fraction_absorption >
+                                     25.0), sigmaclip_flux_prev +
+                                    1.0*sigmaclip_sigma, 0.0)
+    sigmaclip_flux_case5 = np.where((fraction_emission < 33) &
+                                    (fraction_absorption >= 33) &
+                                    (fraction_emission-fraction_absorption <=
+                                     25.0), sigmaclip_flux_prev +
+                                    0.5*sigmaclip_sigma, 0.0)
+    sigmaclip_flux_case6 = np.where((fraction_emission >= 33) &
+                                    (fraction_absorption >= 33) &
+                                    (fraction_emission-fraction_absorption >
+                                     25.0), sigmaclip_flux_prev -
+                                    1.0*sigmaclip_sigma, 0.0)
+    sigmaclip_flux_case7 = np.where((fraction_emission >= 33) &
+                                    (fraction_absorption >= 33) &
+                                    (fraction_absorption-fraction_emission >
+                                     25.0), sigmaclip_flux_prev +
+                                    1.0*sigmaclip_sigma, 0.0)
+    sigmaclip_flux_case8 = np.where((fraction_emission >= 33) &
+                                    (fraction_absorption >= 33) &
+                                    (abs(fraction_absorption-fraction_emission)
+                                     <= 25.0), sigmaclip_flux_prev, 0.0)
     
-    sigmaclip_flux = sigmaclip_flux_case1 + sigmaclip_flux_case2 + sigmaclip_flux_case3 + sigmaclip_flux_case4 + sigmaclip_flux_case5 + sigmaclip_flux_case6 + sigmaclip_flux_case7 + sigmaclip_flux_case8
+    sigmaclip_flux = (sigmaclip_flux_case1 + sigmaclip_flux_case2 +
+                      sigmaclip_flux_case3 + sigmaclip_flux_case4 +
+                      sigmaclip_flux_case5 + sigmaclip_flux_case6 +
+                      sigmaclip_flux_case7 + sigmaclip_flux_case8)
     
     # Remove masked values if any
     if isinstance(sigmaclip_flux_prev, np.ma.MaskedArray):

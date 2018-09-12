@@ -435,7 +435,7 @@ def c_sigmaclip(flux, rms_noise, freq_axis, sigma_clip_threshold=1.8):
     if isinstance(sigmaclip_noise, np.ma.MaskedArray):
         sigmaclip_noise = sigmaclip_noise.filled()
 
-    return sigmaclip_flux_prev, sigmaclip_flux, sigmaclip_noise
+    return sigmaclip_flux_prev, sigmaclip_flux, sigmaclip_noise, filtered_data
 
 ##======================================================================
 def cont_histo(flux, rms_noise):

@@ -218,7 +218,7 @@ def process_files(iname=False,
                 nchan = len(flux)
                 flux = flux
 
-            sigmaclip_flux_prev, sigmaclip_flux, sigmaclip_noise = c_sigmaclip(flux, rms_noise, freq_axis)
+            sigmaclip_flux_prev, sigmaclip_flux, sigmaclip_noise, filtered_data = c_sigmaclip(flux, rms_noise, freq_axis)
             continuum_flux = sigmaclip_flux
             continuum_noise = sigmaclip_noise
 

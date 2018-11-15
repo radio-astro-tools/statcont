@@ -383,7 +383,7 @@ def c_sigmaclip(flux, rms_noise, freq_axis, sigma_clip_threshold=1.8):
                            flux[view1].shape[0])
     
     # Apply correction to continuum level
-    # see details in Sect. 2.4 of Sanchez-Monge et al. (2018)
+    # see details in Sect. 2.4 of paper Sanchez-Monge et al. (2018)
     sigmaclip_flux_case1 = np.where((fraction_emission < 33) &
                                     (fraction_absorption < 33),
                                     sigmaclip_flux_prev, 0.0)

@@ -122,10 +122,10 @@ def process_files(iname=False,
                 number_pixels = cutout[2]
                 if verbose >= 1:
                     print("  . Cutout of %s \n    at central pixel %i, %i with size %i" % (data_fitsfile, central_xpixel, central_ypixel, number_pixels))
-                cutout_fitsfile = cutout_path + file_name + '_cutout' + extension
+                cutout_fitsfile = cutout_path + file_name + '_cutout_' + str(central_xpixel) + '_' + str(central_ypixel) + '_' + str(number_pixels) + extension
                 fits_cutout(data_fitsfile, central_xpixel, central_ypixel, number_pixels, cutout_fitsfile)
                 tmp_path = cutout_path
-                tmp_file = file_name + '_cutout'
+                tmp_file = file_name + '_cutout_' + str(central_xpixel) + '_' + str(central_ypixel) + '_' + str(number_pixels)
                 tmp_files.append(tmp_file)
         else:
             tmp_files = []

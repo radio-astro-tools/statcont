@@ -358,11 +358,7 @@ def c_sigmaclip(flux, rms_noise, freq_axis, sigma_clip_threshold=1.8):
     # presence of emission and/or absorption line features
 
     naxis = len(flux.shape)
-<<<<<<< HEAD
 
-=======
-    
->>>>>>> 1f03a91f8e5a92b32c695d90301f3fd3ced6fa72
     # Handle different shapes; Stokes cube, cube, and single spectra
     if naxis == 4:
 
@@ -380,7 +376,6 @@ def c_sigmaclip(flux, rms_noise, freq_axis, sigma_clip_threshold=1.8):
     fraction_emission = (100 * (flux[view1] >
                                 (sigmaclip_flux+1*rms_noise)).sum(axis=0) /
                          flux[view1].shape[0])
-<<<<<<< HEAD
     
     # Set up the fraction of channels (in %) that are in absorption
     fraction_absorption = (100 * (flux[view1] <
@@ -389,16 +384,6 @@ def c_sigmaclip(flux, rms_noise, freq_axis, sigma_clip_threshold=1.8):
     
     # Apply correction to continuum level
     # see details in Sect. 2.4 of Sanchez-Monge et al. (2018)
-=======
-    
-    # Set up the fraction of channels (in %) that are in absorption
-    fraction_absorption = (100 * (flux[view1] <
-                                  (sigmaclip_flux-1*rms_noise)).sum(axis=0) /
-                           flux[view1].shape[0])
-    
-    # Apply correction to continuum level
-    # see details in Sect. 2.4 of Sanchez-Monge et al. (2017)
->>>>>>> 1f03a91f8e5a92b32c695d90301f3fd3ced6fa72
     sigmaclip_flux_case1 = np.where((fraction_emission < 33) &
                                     (fraction_absorption < 33),
                                     sigmaclip_flux_prev, 0.0)

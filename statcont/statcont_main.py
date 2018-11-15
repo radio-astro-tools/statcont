@@ -67,17 +67,17 @@ def process_files(iname=False,
         data_path = "./"
         cont_path = "./"
         line_path = cont_path
-
         if ipath:
             source = ipath[0]
             sourcedir = source + '/'
             data_path = data_path + sourcedir
-            cutout_path = data_path + 'cutout/'
-            os.system('mkdir -p ' + cutout_path)
             cont_path = cont_path + sourcedir
             os.system('mkdir -p ' + cont_path)
             line_path = line_path + sourcedir
             os.system('mkdir -p ' + line_path)
+        if cutout:
+            cutout_path = data_path + 'cutout/'
+            os.system('mkdir -p ' + cutout_path)
     else:
         data_path = "data/"
         cont_path = "products/"
@@ -90,12 +90,13 @@ def process_files(iname=False,
             source = ipath[0]
             sourcedir = source + '/'
             data_path = data_path + sourcedir
-            cutout_path = data_path + 'cutout/'
-            os.system('mkdir -p ' + cutout_path)
             cont_path = cont_path + sourcedir
             os.system('mkdir -p ' + cont_path)
             line_path = line_path + sourcedir
             os.system('mkdir -p ' + line_path)
+        if cutout:
+            cutout_path = data_path + 'cutout/'
+            os.system('mkdir -p ' + cutout_path)
 
     plots_path = cont_path + 'statcont-plots/'
     os.system('mkdir -p ' + plots_path)

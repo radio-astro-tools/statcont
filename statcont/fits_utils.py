@@ -148,22 +148,22 @@ def fits_merge(tmp_files, tmp_path, extension, merged_file_name, merged_path):
 
             if icount == 0:
                 bnchan[icount] = 0
-                enchan[icount] = nchan
+                enchan[icount] = int(nchan)
             else:
                 jcount = icount-1
-                bnchan[icount] = enchan[jcount]
-                enchan[icount] = nchan+enchan[jcount]
+                bnchan[icount] = int(enchan[jcount])
+                enchan[icount] = int(nchan+enchan[jcount])
         
             icount = icount + 1
 
         # Create output merged file
-        merged_data = np.empty([npolz,enchan[icount-1],nypix,nxpix])
+        merged_data = np.empty([npolz,int(enchan[icount-1]),nypix,nxpix])
         
         # Write data to the new merged file
         icount = 0
         for tmp_file in tmp_files:
             data = fits.getdata(tmp_path + tmp_file + extension)
-            merged_data[0,bnchan[icount]:enchan[icount],:,:] = data
+            merged_data[0,int(bnchan[icount]):int(enchan[icount]),:,:] = data
             icount = icount + 1
 
         os.system('rm -rf ' + merged_file)

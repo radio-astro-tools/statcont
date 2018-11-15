@@ -8,9 +8,9 @@
  STATCONT: A statistical continuum level determination method for
            line-rich sources"
 
- Sanchez-Monge et al (2017, A&A, submitted)
+ Sanchez-Monge et al (2018, A&A,609, A101)
  Details in https://hera.ph1.uni-koeln.de/~sanchez/statcont
- version 1.2
+ version 1.4
 
 """
 
@@ -23,7 +23,7 @@ def main(args=None):
 
     # Creating the list of options
     pars = argparse.ArgumentParser(description="+++ ----------------------------------------------------------------------- \
-                                                +++ STATCONT : A statistical continuum level determination method (v 1.3) - \
+                                                +++ STATCONT : A statistical continuum level determination method (v 1.4) - \
                                                 +++ please refer to Sanchez-Monge et al. (2018, A&A, 609, A101)")
     grou = pars.add_mutually_exclusive_group()
     grou.add_argument('-i', '--iname', nargs='*',

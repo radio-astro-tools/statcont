@@ -38,7 +38,8 @@ def process_files(iname=False,
                   plots=False,
                   cutout=False,
                   verbose=None,
-                  betaversion=False):
+                  betaversion=False,
+                  localdir=False):
 
     # Read name of files to be processed
     # - for FITS file (extension if .fits)
@@ -59,28 +60,44 @@ def process_files(iname=False,
         extension = '.dat'
 
     # Create directories and define working paths
-    os.system('mkdir -p data/')
-    os.system('mkdir -p products/')
     if betaversion:
-        os.system('mkdir -p developers/')
+        os.system('mkdir -p statcont-developers/')
 
-    data_path = "data/"
-    cont_path = "products/"
-    line_path = cont_path
+    if localdir:
+        data_path = "./"
+        cont_path = "./"
+        line_path = cont_path
 
-    # Define sub-directory (within data/) containing the files to be processed
-    if ipath:
-        source = ipath[0]
-        sourcedir = source + '/'
-        data_path = data_path + sourcedir
-        cutout_path = data_path + 'cutout/'
-        os.system('mkdir -p ' + cutout_path)
-        cont_path = cont_path + sourcedir
+        if ipath:
+            source = ipath[0]
+            sourcedir = source + '/'
+            data_path = data_path + sourcedir
+            cutout_path = data_path + 'cutout/'
+            os.system('mkdir -p ' + cutout_path)
+            cont_path = cont_path + sourcedir
+            os.system('mkdir -p ' + cont_path)
+            line_path = line_path + sourcedir
+            os.system('mkdir -p ' + line_path)
+    else:
+        data_path = "data/"
+        cont_path = "products/"
+        line_path = cont_path
+        os.system('mkdir -p ' + data_path)
         os.system('mkdir -p ' + cont_path)
-        line_path = line_path + sourcedir
-        os.system('mkdir -p ' + line_path)
+        
+        # Define sub-directory (within data/) containing the files to be processed
+        if ipath:
+            source = ipath[0]
+            sourcedir = source + '/'
+            data_path = data_path + sourcedir
+            cutout_path = data_path + 'cutout/'
+            os.system('mkdir -p ' + cutout_path)
+            cont_path = cont_path + sourcedir
+            os.system('mkdir -p ' + cont_path)
+            line_path = line_path + sourcedir
+            os.system('mkdir -p ' + line_path)
 
-    plots_path = cont_path + 'plots/'
+    plots_path = cont_path + 'statcont-plots/'
     os.system('mkdir -p ' + plots_path)
 
     # Set path and file names ...
@@ -121,7 +138,7 @@ def process_files(iname=False,
         if verbose >= 1:
             print("+++ Merging files ...")
         
-        merged_path = data_path + 'merged/'
+        merged_path = data_path + 'statcont-merged/'
         os.system('mkdir -p ' + merged_path)
 
         # Name of the output file
@@ -436,7 +453,7 @@ def process_files(iname=False,
                                 if betaversion:
                                     if verbose >= 1:
                                         print(" < DEVELOPERS > ")
-                                        print(" < DEVELOPERS > ... KDE available in file developers/STATCONT_KDE_distribution.dat")
+                                        print(" < DEVELOPERS > ... KDE available in file statcont-developers/STATCONT_KDE_distribution.dat")
 
                                 if verbose >= 3:
                                     print("    flux of KDEmax       = " + str(int(KDEmax_flux*1.e5)/1.e5))
@@ -483,7 +500,7 @@ def process_files(iname=False,
                                     sigmaclip_flux_prev, sigmaclip_flux, sigmaclip_noise, real_fraction_emission, fraction_emission, real_fraction_absorption, fraction_absorption = c_sigmaclip1D(flux, rms_noise, betaversion)
                                     if verbose >= 1:
                                         print(" < DEVELOPERS > ")
-                                        print(" < DEVELOPERS > ... data and filtered data available in file developers/STATCONT_sigmaclip_filtered.dat")
+                                        print(" < DEVELOPERS > ... data and filtered data available in file statcont-developers/STATCONT_sigmaclip_filtered.dat")
 
                                 if verbose >= 3:
                                     print("    flux of sigma-clip   = " + str(int(sigmaclip_flux_prev*1.e5)/1.e5) + " +/- " + str(int(sigmaclip_noise*1.e5)/1.e5))

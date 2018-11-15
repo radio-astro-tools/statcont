@@ -96,6 +96,8 @@ def main(args=None):
                             2: Standard level of output verbosity (default value) \
                             3: Increase level of output verbosity (more details) \
                             4: Switch on all messages (for developers)')
+    pars.add_argument('--localdir', action='store_true',
+                      help='Data and product files stored in working directory')
     pars.add_argument('--betaversion', action='store_true',
                       help='DEVELOPERS: For developers and testing')
     op = pars.parse_args(args)
@@ -163,4 +165,6 @@ def main(args=None):
                   model=op.model,
                   plots=op.plots,
                   cutout=op.cutout,
-                  verbose=verbose)
+                  verbose=verbose,
+                  betaversion=op.betaversion,
+                  localdir=op.localdir)

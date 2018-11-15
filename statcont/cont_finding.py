@@ -155,7 +155,7 @@ def c_KDEmax(flux, rms_noise, betaversion):
     
     # Write out the KDE as ASCII file
     if betaversion:
-        ascii.write((KDEx, KDEpos), output='developers/STATCONT_KDE_distribution.dat')
+        ascii.write((KDEx, KDEpos), output='statcont-developers/STATCONT_KDE_distribution.dat')
     
     return KDEmax_flux
 
@@ -292,7 +292,7 @@ def c_sigmaclip1D(flux, rms_noise, betaversion, sigma_clip_threshold=2.0):
 
     # Write out the original and filtered data as a two-column ASCII file
     if betaversion:
-        ascii.write((flux, filtered_data), output='developers/STATCONT_sigmaclip_filtered.dat')
+        ascii.write((flux, filtered_data), output='statcont-developers/STATCONT_sigmaclip_filtered.dat')
         
         # Determine the numbers of channels above and under the real continuum level,
         # for synthetic files with continuum level set to 50.0

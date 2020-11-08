@@ -348,7 +348,7 @@ def c_sigmaclip(flux, rms_noise, freq_axis, sigma_clip_threshold=1.8):
 
     # Sigma-clipping method applied to the flux array
     filtered_data = astropy.stats.sigma_clip(flux, sigma=sigma_clip_threshold,
-                                             iters=None, axis=freq_axis)
+                                             maxiters=None, axis=freq_axis)
 
     sigmaclip_flux_prev = sigmaclip_flux = np.mean(filtered_data, axis=freq_axis)
     sigmaclip_noise = sigmaclip_sigma = np.std(filtered_data, axis=freq_axis)

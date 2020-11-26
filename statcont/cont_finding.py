@@ -619,4 +619,4 @@ def c_sigmaclip_scube(cube, rms_noise, freq_axis=0, sigma_clip_threshold=1.8):
     if isinstance(sigmaclip_noise, np.ma.MaskedArray):
         sigmaclip_noise = sigmaclip_noise.filled()
 
-    return sigmaclip_flux_prev, sigmaclip_flux, sigmaclip_noise, filtered_cube
+    return sigmaclip_flux_prev, sigmaclip_flux, sigmaclip_noise

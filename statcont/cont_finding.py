@@ -539,11 +539,15 @@ def c_sigmaclip_scube(cube, rms_noise, freq_axis=0, sigma_clip_threshold=1.8):
         of STATCONT
     """
 
+    # ensure the rms_noise is in the right unit
+    rms_noise = u.Quantity(rms_noise, cube.unit)
+
     try:
         # if dask, rechunk to use full spectral axes
         cube = cube.rechunk([-1, 'auto', 'auto'])
     except AttributeError:
         pass
+
 
     # Sigma-clipping method applied to the flux array
     filtered_cube = cube.sigma_clip_spectrally(threshold=sigma_clip_threshold,

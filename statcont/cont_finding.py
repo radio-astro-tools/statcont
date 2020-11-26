@@ -538,6 +538,7 @@ def c_sigmaclip_scube(cube, rms_noise, freq_axis=0, sigma_clip_threshold=1.8):
         with the sigma-clipping method without applying the correction
         of STATCONT
     """
+    from astropy import units as u
 
     # ensure the rms_noise is in the right unit
     rms_noise = u.Quantity(rms_noise, cube.unit)

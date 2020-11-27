@@ -564,12 +564,12 @@ def c_sigmaclip_scube(cube, rms_noise, freq_axis=0, sigma_clip_threshold=1.8,
 
     # Set up the fraction of channels (in %) that are in emission
     fraction_emission = (100 * (cube >
-                                (sigmaclip_flux+1*rms_noise)).sum(axis=freq_axis) /
+                                (sigmaclip_flux+1*rms_noise)).include().sum(axis=freq_axis) /
                          cube.shape[freq_axis])
 
     # Set up the fraction of channels (in %) that are in absorption
     fraction_absorption = (100 * (cube <
-                                  (sigmaclip_flux-1*rms_noise)).sum(axis=freq_axis) /
+                                  (sigmaclip_flux-1*rms_noise)).include().sum(axis=freq_axis) /
                            cube.shape[freq_axis])
 
     # Apply correction to continuum level

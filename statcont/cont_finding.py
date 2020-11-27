@@ -527,6 +527,12 @@ def c_sigmaclip_scube(cube, rms_noise, freq_axis=0, sigma_clip_threshold=1.8,
     sigma_clip_threshold : float
         The threshold in number of sigma above/below which to reject outlier
         data
+    save_to_tmp_dir : bool
+        Save the intermediate calculated ``sigma_clip_spectrally`` result to
+        a temporary ``zarr`` file before doing subsequent operations?
+        This may speed up calculations by ~2x.  Be sure that your default
+        temp directory can store the full cube; the tempdir location can be
+        set with the environmental variable TEMPDIR.
 
     Returns
     -------

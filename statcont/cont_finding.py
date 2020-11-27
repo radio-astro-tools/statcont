@@ -508,7 +508,8 @@ def cont_histo(flux, rms_noise):
 
     return all_bins, all_hist, sel_bins, sel_hist, sel_flux
 
-def c_sigmaclip_scube(cube, rms_noise, freq_axis=0, sigma_clip_threshold=1.8):
+def c_sigmaclip_scube(cube, rms_noise, freq_axis=0, sigma_clip_threshold=1.8,
+                      save_to_tmp_dir=True):
     """
     Perform sigma-clipping to determine the mean flux level, with different
     adaptations for emission- and absorption-dominated spectra
@@ -552,7 +553,7 @@ def c_sigmaclip_scube(cube, rms_noise, freq_axis=0, sigma_clip_threshold=1.8):
 
     # Sigma-clipping method applied to the flux array
     filtered_cube = cube.sigma_clip_spectrally(threshold=sigma_clip_threshold,
-                                               save_to_tmp_dir=True,
+                                               save_to_tmp_dir=save_to_tmp_dir,
                                                maxiters=None)
 
     sigmaclip_flux_prev = sigmaclip_flux = filtered_cube.mean(axis=freq_axis)

@@ -509,6 +509,7 @@ def cont_histo(flux, rms_noise):
     return all_bins, all_hist, sel_bins, sel_hist, sel_flux
 
 def c_sigmaclip_scube(cube, rms_noise, freq_axis=0, sigma_clip_threshold=1.8,
+                      rechunk=[-1, 'auto', 'auto'],
                       save_to_tmp_dir=True):
     """
     Perform sigma-clipping to determine the mean flux level, with different
@@ -527,6 +528,11 @@ def c_sigmaclip_scube(cube, rms_noise, freq_axis=0, sigma_clip_threshold=1.8,
     sigma_clip_threshold : float
         The threshold in number of sigma above/below which to reject outlier
         data
+    rechunk : None or list
+        Shape to rechunk the dask cube to.  -1 is to use the whole axis,
+        'auto' is to automatically determine it.  [-1, 'auto', 'auto']
+        chunks into full spectral with automatically-determined spatial
+        chunk sizes.  [-1,1,1] would be chunking each spectrum separately.
     save_to_tmp_dir : bool
         Save the intermediate calculated ``sigma_clip_spectrally`` result to
         a temporary ``zarr`` file before doing subsequent operations?
@@ -550,11 +556,12 @@ def c_sigmaclip_scube(cube, rms_noise, freq_axis=0, sigma_clip_threshold=1.8,
     # ensure the rms_noise is in the right unit
     rms_noise = u.Quantity(rms_noise, cube.unit)
 
-    try:
-        # if dask, rechunk to use full spectral axes
-        cube = cube.rechunk([-1, 'auto', 'auto'])
-    except AttributeError:
-        pass
+    if rechunk is not None:
+        try:
+            # if dask, rechunk to use full spectral axes
+            cube = cube.rechunk(rechunk)
+        except AttributeError:
+            pass
 
 
     # Sigma-clipping method applied to the flux array

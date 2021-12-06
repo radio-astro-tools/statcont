@@ -10,7 +10,7 @@
 
  Sanchez-Monge et al (2018, A&A,609, A101)
  Details in https://hera.ph1.uni-koeln.de/~sanchez/statcont
- version 1.4
+ version 1.5
 
 """
 

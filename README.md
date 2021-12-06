@@ -29,9 +29,9 @@ Access to the article in [PDF](https://hera.ph1.uni-koeln.de/~sanchez/my_documen
 Download / Installation instructions
 ------------------------------------
 
-STATCONT uses the ASTROPY package-template and is fully compatible with 
-the ASTROPY ecosystem. It is freely available for at the GitHub 
-repository Radio Astro Tools, and in this webpage. The only required 
+STATCONT uses the [ASTROPY](https://www.astropy.org/) package-template and is fully compatible with 
+the ASTROPY ecosystem. It is freely available for at the [GitHub](https://github.com/) 
+repository [Radio Astro Tools](http://radio-astro-tools.github.io/), and in this webpage. The only required 
 software to use STATCONT is Python and Astropy.
 
 You can directly install STATCONT by typing in a terminal session in 
@@ -42,8 +42,7 @@ configuration of your system):
 pip install https://github.com/radio-astro-tools/statcont/archive/master.zip
 ```
 
-If you are a GitHub user, you can clone STATCONT in your computer. 
-Create a directory and move there, then type:
+You can also clone STATCONT in your computer from the GitHub repository. For this, create a directory and move there. Then type:
 
 ```
 git init

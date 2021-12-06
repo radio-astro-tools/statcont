@@ -23,7 +23,7 @@ def main(args=None):
 
     # Creating the list of options
     pars = argparse.ArgumentParser(description="+++ ----------------------------------------------------------------------- \
-                                                +++ STATCONT : A statistical continuum level determination method (v 1.4) - \
+                                                +++ STATCONT : A statistical continuum level determination method (v 1.5) - \
                                                 +++ please refer to Sanchez-Monge et al. (2018, A&A, 609, A101)")
     grou = pars.add_mutually_exclusive_group()
     grou.add_argument('-i', '--iname', nargs='*',
@@ -38,6 +38,10 @@ def main(args=None):
                       help='NECESSARY: unless parameters -i or -f are considered. \
                             One single ASCII-format file with two columns: \
                             frequency (c.1) and intensity (c.2), and no header. \
+                            Name of the files without the extension [ .dat ]')
+    grou.add_argument('-l', '--ilist', nargs=1,
+                      help='NECESSARY: unless parameters -i or -s are considered. \
+                            File containing a 1-column list with the file names. \
                             Name of the files without the extension [ .dat ]')
     pars.add_argument('-m', '--imerge', nargs=1,
                       help='OPTIONAL: All the files in --iname are merged \
@@ -109,6 +113,8 @@ def main(args=None):
     # Can be overwritten by specifying the verbosity output level
     if op.ispec and verbose == 2:
         verbose = 3
+    if op.ilist and verbose == 2:
+        verbose = 3
     
     # For developers, activate maximum verbosity
     # Can be overwritten by specifying the verbosity output level
@@ -148,6 +154,7 @@ def main(args=None):
     process_files(iname=op.iname,
                   ifile=op.ifile,
                   ispec=op.ispec,
+                  ilist=op.ilist,
                   imerge=op.imerge,
                   ipath=op.ipath,
                   rms_noise=rms_noise,

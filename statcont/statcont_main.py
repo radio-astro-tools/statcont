@@ -20,6 +20,7 @@ import datetime
 def process_files(iname=False,
                   ifile=False,
                   ispec=False,
+                  ilist=False,
                   imerge=False,
                   ipath=False,
                   rms_noise=None,
@@ -58,6 +59,16 @@ def process_files(iname=False,
     elif ispec:
         input_files = ispec
         extension = '.dat'
+
+    # - for an ASCII file (extension of files is .dat)
+    elif ilist:
+        print(ilist[0])
+        lines = [line.rstrip('\n') for line in open(ilist[0])]
+        input_files = lines
+        extension = '.dat'
+        print("HOLA")
+        print(input_files)
+        print("ADIOS")
 
     # Create directories and define working paths
     if betaversion:
@@ -103,7 +114,7 @@ def process_files(iname=False,
 
     # Set path and file names ...
     # ... and in case of FITS files, use cutout to create smaller files
-    if ispec:
+    if ispec or ilist:
         tmp_files = []
         for file_name in input_files:
             tmp_path = data_path
@@ -172,7 +183,7 @@ def process_files(iname=False,
             bunit = header.get('BUNIT')
 
         # Read data and header of the ASCII file
-        if ispec:
+        if ispec or ilist:
 
             specfile = open(tmp_path + tmp_file + extension, 'r')
 
@@ -221,7 +232,7 @@ def process_files(iname=False,
                 freq = np.array(freqs)
 
             # For ASCII files
-            if ispec:
+            if ispec or ilist:
 
                 # Write the intensity of a given pixel for all the channels into the array flux
                 # and the frequencies in the array freqs
@@ -343,7 +354,7 @@ def process_files(iname=False,
                             freq = np.array(freqs)
 
                         # For ASCII files
-                        if ispec:
+                        if ispec or ilist:
 
                             # Write the intensity of a given pixel for all the channels into the array flux
                             # and the frequencies in the array freqs
@@ -533,7 +544,7 @@ def process_files(iname=False,
                                     ax2.axhline(y=maximum_flux, linestyle='--', color='green', linewidth=1.5)
                                     if iname or ifile:
                                         ax1.text(0.0, 0.9, "Maximum = " + str(int(maximum_flux*1.e5)/1.e5) + " " + bunit)
-                                    if ispec:
+                                    if ispec or ilist:
                                         ax1.text(0.0, 0.8, "Maximum = " + str(int(maximum_flux*1.e5)/1.e5))
                                 if cmean:
                                     ax2.axhline(y=mean_flux, linestyle='--', color='orange', linewidth=1.5)
@@ -541,7 +552,7 @@ def process_files(iname=False,
                                     if iname or ifile:
                                         ax1.text(0.0, 0.6, "Mean = " + str(int(mean_flux*1.e5)/1.e5) + " " + bunit)
                                         ax1.text(0.0, 0.4, "Mean (sel.) = " + str(int(meansel_flux*1.e5)/1.e5) + " " + bunit)
-                                    if ispec:
+                                    if ispec or ilist:
                                         ax1.text(0.0, 0.6, "Mean = " + str(int(mean_flux*1.e5)/1.e5))
                                         ax1.text(0.0, 0.4, "Mean (sel.) = " + str(int(meansel_flux*1.e5)/1.e5))
                                 if cmedian:
@@ -550,7 +561,7 @@ def process_files(iname=False,
                                     if iname or ifile:
                                         ax1.text(0.0, 0.2, "Median = " + str(int(median_flux*1.e5)/1.e5) + " " + bunit)
                                         ax1.text(0.0, 0.0, "Median (sel.) = " + str(int(mediansel_flux*1.e5)/1.e5) + " " + bunit)
-                                    if ispec:
+                                    if ispec or ilist:
                                         ax1.text(0.0, 0.2, "Median = " + str(int(median_flux*1.e5)/1.e5))
                                         ax1.text(0.0, 0.0, "Median (sel.) = " + str(int(mediansel_flux*1.e5)/1.e5))
                                 if cpercent:
@@ -558,13 +569,13 @@ def process_files(iname=False,
                                     ax2.axhline(y=percent75_flux, linestyle='--', color='red', linewidth=1.5)
                                     if iname or ifile:
                                         ax1.text(0.4, 0.8, "Percent 25th = " + str(int(percent25_flux*1.e5)/1.e5) + " " + bunit)
-                                    if ispec:
+                                    if ispec or ilist:
                                         ax1.text(0.4, 0.8, "Percent 25th = " + str(int(percent25_flux*1.e5)/1.e5))
                                 if cKDEmax:
                                     ax2.axhline(y=KDEmax_flux, linestyle='-', color='black', linewidth=1.5)
                                     if iname or ifile:
                                         ax1.text(0.4, 0.6, "KDE max = " + str(int(KDEmax_flux*1.e5)/1.e5) + " " + bunit)
-                                    if ispec:
+                                    if ispec or ilist:
                                         ax1.text(0.4, 0.6, "KDE max = " + str(int(KDEmax_flux*1.e5)/1.e5))
                                 if cGaussian:
                                     ax2.axhline(y=Gaussian_flux, linestyle='-', color='blue', linewidth=3.0, alpha=0.5)
@@ -572,14 +583,14 @@ def process_files(iname=False,
                                     if iname or ifile:
                                         ax1.text(0.4, 0.4, "Gaussian = " + str(int(Gaussian_flux*1.e5)/1.e5) + " " + bunit + " (+/- " + str(int(Gaussian_noise*1.e5)/1.e5) + ")")
                                         ax1.text(0.4, 0.2, "Gaussian (sel.) = " + str(int(GaussNw_flux*1.e5)/1.e5) + " " + bunit + " (+/- " + str(int(GaussNw_noise*1.e5)/1.e5) + ")")
-                                    if ispec:
+                                    if ispec or ilist:
                                         ax1.text(0.4, 0.4, "Gaussian = " + str(int(Gaussian_flux*1.e5)/1.e5) + " (+/- " + str(int(Gaussian_noise*1.e5)/1.e5) + ")")
                                         ax1.text(0.4, 0.2, "Gaussian (sel.) = " + str(int(GaussNw_flux*1.e5)/1.e5) + " (+/- " + str(int(GaussNw_noise*1.e5)/1.e5) + ")")
                                 if csigmaclip or continuum:
                                     ax2.axhline(y=sigmaclip_flux, linestyle='-', color='red', linewidth=1.5)
                                     if iname or ifile:
                                         ax1.text(0.4, 0.0, "corrSigma-clip = " + str(int(sigmaclip_flux*1.e5)/1.e5) + " " + bunit + " (+/- " + str(int(sigmaclip_noise*1.e5)/1.e5) + ")")
-                                    if ispec:
+                                    if ispec or ilist:
                                         ax1.text(0.4, 0.0, "corrSigma-clip = " + str(int(sigmaclip_flux*1.e5)/1.e5) + " (+/- " + str(int(sigmaclip_noise*1.e5)/1.e5) + ")")
                                 plt.xlabel('Frequency')
                                 plt.ylabel('Intensity')
@@ -648,7 +659,7 @@ def process_files(iname=False,
                 os.system('rm -rf ' + output_file)
                 if iname or ifile:
                     fits.writeto(output_file, np.float32(output_flux), header=header, overwrite=True)
-                if ispec:
+                if ispec or ilist:
                     output_array = [np.median(freq)]
                     if type(output_flux) != list:
                         output_array.append(output_flux)
@@ -698,7 +709,7 @@ def process_files(iname=False,
                 for cont_file in cont_files:
 
                     # For ASCII files
-                    if ispec:
+                    if ispec or ilist:
 
                         fdata_cont = open(cont_path + cont_file + extension, 'r')
 
@@ -915,15 +926,25 @@ def process_files(iname=False,
             if verbose >= 1:
                 print(" ")
                 print("+++ PRODUCING MODEL USING THE SPECTRAL INDEX ...")
-            
+
             if extension=='.dat':
-                
+
+                #model_conts = []
+                #model_freqs = []
                 for tmp_file in tmp_files:
-                    
+
                     # Create a frequency array from the original data cube
                     f = open(cont_path + tmp_file + '_continuum' + extension)
                     for line in f:
-                        print(float(line.split()[1]))
+                        print("Frequency: " + str(float(line.split()[0])) + "  Continuum: " + str(float(line.split()[1])))
+                        #model_conts.append(float(line.split()[1]))
+                        #model_freqs.append(float(line.split()[0]))
+
+                #model_cont = np.array(model_conts)
+                #model_freq = np.array(model_freqs)
+
+                #cont_model_file = cont_path + tmp_file + '_cont_model' + extension
+                #ascii.write((model_freq, model_cont), output=cont_model_file, overwrite=True)
 
             if extension=='.fits':
                 # Read the spectral index (m) and the intercept (n)
@@ -979,7 +1000,7 @@ def process_files(iname=False,
                     fits.writeto(line_model_file, np.float32(line_model), header=cube_header, overwrite=True)
 
             # Indicate where the created files can be found
-            if verbose >= 1:
+            if verbose >= 1 and extension=='.fits':
                 print("... FILEs CREATED are found in " + cont_path)
                 print("  . search for cont_model and line_cont_model")
                 print(" ")

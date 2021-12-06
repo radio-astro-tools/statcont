@@ -31,10 +31,10 @@ More information about STATCONT can be found in the webpage [http://www.astro.un
 Download / Installation instructions
 ------------------------------------
 
-STATCONT uses the [ASTROPY](https://www.astropy.org/) package-template and is fully compatible with 
-the ASTROPY ecosystem. It is freely available for at the [GitHub](https://github.com/) 
-repository [Radio Astro Tools](http://radio-astro-tools.github.io/), and in this webpage. The only required 
-software to use STATCONT is Python and Astropy.
+STATCONT uses the [ASTROPY](https://www.astropy.org/) package-template and is
+fully compatible with the ASTROPY ecosystem. It is freely available for at
+the [GitHub](https://github.com/) repository [Radio Astro Tools](http://radio-astro-tools.github.io/),
+and in this webpage. The only required software to use STATCONT is Python and Astropy.
 
 You can directly install STATCONT by typing in a terminal session in 
 your computer (you may need sudo permissions depending on the 
@@ -44,7 +44,8 @@ configuration of your system):
 pip install https://github.com/radio-astro-tools/statcont/archive/master.zip
 ```
 
-You can also clone STATCONT in your computer from the GitHub repository. For this, create a directory and move there. Then type:
+You can also clone STATCONT in your computer from the GitHub repository. For
+this, create a directory and move there. Then type:
 
 ```
 git init
@@ -63,7 +64,10 @@ cd statcont
 python setup.py install
 ```
 
-If you get a permission error, this means that you do not have the required administrative access to install STATCONT to your Python installation. In this case you can use the option --user when installing the setup.py script. You can follow these instructions:
+If you get a permission error, this means that you do not have the required
+administrative access to install STATCONT to your Python installation. In
+this case you can use the option --user when installing the setup.py script.
+You can follow these instructions:
 
 ```
 python setup.py install --user --install-scripts="~/bin/"
@@ -79,12 +83,20 @@ statcont --help
 ```
 
 ---------------------
-Required python packages
+Required Python packages
 ---------------------
 
-In the following we explain how to execute the main tasks of STATCONT. 
-A set of test cases is provided in this test_cases.tar.gz file. 
-Download the file to your computer and follow these instructions:
+STATCONT uses the following Python packates:
+
+astropy
+argparse
+datetime
+math
+matplotlib
+numpy
+os
+scipy
+
 
 ---------------------
 Examples / Test cases
@@ -99,14 +111,16 @@ gunzip test_cases.tar.gz
 tar -xvf test_cases.tar
 ```
 
-This creates a directory called data that contains three other 
-subdirectories `MAP_TESTS`, `SPEC_TESTS`, and `SPINDEX`
+This creates a directory called `statcont_test_cases`. Inside, you will
+find a directory called data that contains three other subdirectories
+`MAP_TESTS`, `SPEC_TESTS`, and `SPINDEX`
 
 STATCONT requires of a directory data where the files to be processed 
-are saved. By executing STATCONT, another directory called products 
+are stored. By executing STATCONT, another directory called products 
 will be generated. The files to be processed, can be directly saved in 
 data or in subdirectories. In the examples provided here, we have a set 
-of single-spectrum saved in `SPEC_TESTS` and FITS cubes in `MAP_TESTS`.
+of single-spectrum files (in ASCII format) saved in `SPEC_TESTS` and
+`SPINDEX, and FITS cubes in `MAP_TESTS`.
 
 
 Determining the continuum in single spectrum files (ASCII files)

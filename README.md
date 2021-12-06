@@ -88,15 +88,17 @@ Required Python packages
 
 STATCONT uses the following Python packates:
 
-astropy
-argparse
-datetime
-math
-matplotlib
-numpy
-os
-scipy
+- [astropy](https://www.astropy.org/) : version >= 4.2.1
+- [argparse](https://docs.python.org/3/library/argparse.html) : version >= 1.1
+- [datetime](https://docs.python.org/3/library/datetime.html)
+- [math](https://docs.python.org/3/library/math.html)
+- [matplotlib](https://matplotlib.org/) : version >= 3.5.0
+- [numpy](https://numpy.org/) : version >= 1.21.4
+- [os](https://docs.python.org/3/library/os.html)
+- [scipy](https://scipy.org/) : version >= 1.7.3
 
+The versions indicated above have been recently tested, older versions
+worked fine in previous tests and are expected to continue working.
 
 ---------------------
 Examples / Test cases

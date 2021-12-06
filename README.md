@@ -219,9 +219,9 @@ You can use all the continuum methods and plot them all together, like:
    statcont -p SPEC_TESTS -s my_emission -n 1 --call --plots
 ```
 
-Have a look now at the plot products/SPEC_TESTS/plots/my_emission_1_1.png
+Have a look now at the plot products/SPEC_TESTS/plots/my_emission_1_1.png (see image below)
 
-![This is an image](test-cases/my_emission_1_1.png)
+![STATCONT all methods](test-cases/my_emission_1_1.png)
  
 
 Determining the continuum in a 3D cube file (FITS files)

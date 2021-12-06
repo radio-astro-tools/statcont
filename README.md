@@ -177,7 +177,7 @@ You can call several methods at once:
    statcont -p SPEC_TESTS -s my_emission -n 1 --cmax --cGaussian --csigmaclip
 ```
 
-The different methods are explained in Sanchez-Monge et al (2017)
+The different methods are explained in [Sanchez-Monge et al (2018)](https://ui.adsabs.harvard.edu/abs/2018A%26A...609A.101S/abstract)
 
 If you want to remove the continuum from the original spectrum, in 
 order to produce a line-only data file, you can use:

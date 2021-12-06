@@ -91,7 +91,7 @@ Examples / Test cases
 ---------------------
 
 In the following we explain how to execute the main tasks of STATCONT. 
-A set of test cases is provided in this test_cases.tar.gz file. 
+A set of test cases is provided in this [test_cases.tar.gz](https://hera.ph1.uni-koeln.de/~sanchez/software/STATCONT/test_cases.tar.gz) file. 
 Download the file to your computer and follow these instructions:
 
 ```
@@ -99,8 +99,8 @@ gunzip test_cases.tar.gz
 tar -xvf test_cases.tar
 ```
 
-This creates a directory called data that contains two other 
-subdirectories `SPEC_TESTS` and `MAP_TESTS`
+This creates a directory called data that contains three other 
+subdirectories `MAP_TESTS`, `SPEC_TESTS`, and `SPINDEX`
 
 STATCONT requires of a directory data where the files to be processed 
 are saved. By executing STATCONT, another directory called products 

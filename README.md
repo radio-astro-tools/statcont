@@ -53,13 +53,12 @@ cd statcont
 python setup.py install
 ```
 
-Alternatively, STATCONT can also be downloaded locally as a file 
-STATCONT.tar.gz from: http://www.astro.uni-koeln.de/~sanchez/statcont
+Alternatively, STATCONT can also be downloaded locally as a zip file 
+from: [master.zip](https://github.com/radio-astro-tools/statcont/archive/master.zip).
 In order to install it, download the file to a directory in your computer:
 
 ```
-gunzip STATCONT.tar.gz
-tar -xvf STATCONT.tar
+unzip master.zip
 cd statcont
 python setup.py install
 ```
@@ -78,6 +77,14 @@ inspect the help by doing:
 ```
 statcont --help
 ```
+
+---------------------
+Required python packages
+---------------------
+
+In the following we explain how to execute the main tasks of STATCONT. 
+A set of test cases is provided in this test_cases.tar.gz file. 
+Download the file to your computer and follow these instructions:
 
 ---------------------
 Examples / Test cases

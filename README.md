@@ -24,6 +24,8 @@ If you find STATCONT useful, please cite/refer to:
 [Sanchez-Monge, Schilke, Ginsburg, Cesaroni and Schmiedeke 2018, A&A, 609, A101](https://ui.adsabs.harvard.edu/abs/2018A%26A...609A.101S/abstract)
 Access to the article in [PDF](https://hera.ph1.uni-koeln.de/~sanchez/my_documents/publications/SanchezMonge_etal_2018.pdf) format.
 
+More information about STATCONT can be found in the webpage [http://www.astro.uni-koeln.de/~sanchez/statcont](http://www.astro.uni-koeln.de/~sanchez/statcont)
+
 
 ------------------------------------
 Download / Installation instructions
@@ -60,6 +62,13 @@ gunzip STATCONT.tar.gz
 tar -xvf STATCONT.tar
 cd statcont
 python setup.py install
+```
+
+If you get a permission error, this means that you do not have the required administrative access to install STATCONT to your Python installation. In this case you can use the option --user when installing the setup.py script. You can follow these instructions:
+
+```
+python setup.py install --user --install-scripts="~/bin/"
+export PATH=~/bin/:$PATH
 ```
 
 Following the installation, you have immediate access to STATCONT in 

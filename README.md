@@ -146,7 +146,7 @@ If you want to determine the continuum level:
 ```
 
   - The option --continuum makes use of the 'corrected sigma-clipping 
-    algorithm' described in Sanchez-Monge et al (2017), to determine
+    algorithm' described in [Sanchez-Monge et al (2018)](https://ui.adsabs.harvard.edu/abs/2018A%26A...609A.101S/abstract), to determine
     the continuum level, the error in the continuum level, and to
     produce a file that contains only the line emission, i.e. a
     continuum-subtracted file

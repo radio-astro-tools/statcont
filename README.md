@@ -221,6 +221,8 @@ You can use all the continuum methods and plot them all together, like:
 
 Have a look now at the plot products/SPEC_TESTS/plots/my_emission_1_1.png
 
+![This is an image](statcont/test-cases/my_emission_1_1.png)
+ 
 
 Determining the continuum in a 3D cube file (FITS files)
 --------------------------------------------------------

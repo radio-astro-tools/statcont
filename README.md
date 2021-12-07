@@ -52,7 +52,7 @@ your computer (you may need sudo permissions depending on the
 configuration of your system):
 
 ```
-pip install https://github.com/radio-astro-tools/statcont/archive/master.zip
+   pip install https://github.com/radio-astro-tools/statcont/archive/master.zip
 ```
 
 **Installation method 2**<br />
@@ -60,10 +60,10 @@ You can also clone STATCONT in your computer from the GitHub repository. For
 this, create a directory and move there. Then type:
 
 ```
-git init
-git clone https://github.com/radio-astro-tools/statcont
-cd statcont
-python setup.py install
+   git init
+   git clone https://github.com/radio-astro-tools/statcont
+   cd statcont
+   python setup.py install
 ```
 
 **Installation method 3**<br />
@@ -72,9 +72,9 @@ from: [master.zip](https://github.com/radio-astro-tools/statcont/archive/master.
 In order to install it, download the file to a directory in your computer:
 
 ```
-unzip master.zip
-cd statcont
-python setup.py install
+   unzip master.zip
+   cd statcont
+   python setup.py install
 ```
 
 **How to solve permission errors**<br />
@@ -84,8 +84,8 @@ this case you can use the option `--user` when installing the setup.py script.
 You can follow these instructions:
 
 ```
-python setup.py install --user --install-scripts="~/bin/"
-export PATH=~/bin/:$PATH
+   python setup.py install --user --install-scripts="~/bin/"
+   export PATH=~/bin/:$PATH
 ```
 
 **Check your installation**<br />
@@ -94,7 +94,7 @@ your computer by typing "statcont" in a terminal session. For example,
 inspect the help by doing:
 
 ```
-statcont --help
+   statcont --help
 ```
 
 At the beginning of the help message you will see the version of STATCONT.
@@ -125,7 +125,7 @@ Main STATCONT commands and options
 The following table contains the main commands and options of STATCONT. They can be explored and executed by typing
 
 ```
-statcont --help
+   statcont --help
 ```
 
 
@@ -153,8 +153,8 @@ A set of test cases is provided in this [test_cases.tar.gz](https://hera.ph1.uni
 Download the file to your computer and follow these instructions:
 
 ```
-gunzip test_cases.tar.gz
-tar -xvf test_cases.tar
+   gunzip test_cases.tar.gz
+   tar -xvf test_cases.tar
 ```
 
 This creates a directory called `statcont-tests`. Inside, you will
@@ -312,10 +312,24 @@ the continuum level of a small portion you can indicate it like this:
     image (in this case 6). With this option, the products are saved
     with the label "_cutout"
 
-If you have multiple FITS files at different frequencies, you can use 
-the option --spindex to determine, first, the continuum level of every 
+
+
+Determining the spectral index from multiple input files
+--------------------------------------------------------
+
+If you have multiple ASCII or FITS files at different frequencies, you can use 
+the option `--spindex` to determine, first, the continuum level of every 
 single file, and then the spectral index, i.e. the variation of the 
 continuum emission with frequency.
+
+The spectral index (ALPHA) is defined as flux = FACTOR * frequency^(ALPHA)
+
+```
+   statcont -p SPINDEX -l list.txt -n 1 --continuum
+   statcont -p SPINDEX -l list.txt -n 1 --spindex
+```
+
+The first command determines the continuum level for all the files contained in the list.txt file, while the second command determines the spectral index.
 
 
 -----------------------------------

@@ -129,7 +129,7 @@ statcont --help
 ```
 
 
-| Command | Description |
+| Command | | Description |
 | --- | --- |
 | `--help` | Show the help message and all the STATCONT commands |
 | `-i` / `--iname` | NECESSARY<br /> (unless `-f`, `-s` or `-l` are used) | Name of the FITS file to be processed (without extension, which should be .fits)<br /> Example: `-i SYNTHETIC_cube`<br /> The file SYNTHETIC_cube.fits has to be stored in the `data` directory |

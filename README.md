@@ -113,7 +113,7 @@ gunzip test_cases.tar.gz
 tar -xvf test_cases.tar
 ```
 
-This creates a directory called `statcont_test_cases`. Inside, you will
+This creates a directory called `statcont-tests`. Inside, you will
 find a directory called data that contains three other subdirectories
 `MAP_TESTS`, `SPEC_TESTS`, and `SPINDEX`
 

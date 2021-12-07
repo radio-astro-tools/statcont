@@ -28,12 +28,7 @@ More information about STATCONT can be found in the webpage [http://www.astro.un
 
 This README document is intented to help you install and use STATCONT using some test-cases provided below. In the following you will find:
   - [**Download / Installation instructions**](https://github.com/radio-astro-tools/statcont#download-/-installation-instructions)
-  - [**Pipeline imaging and continuum determination**](https://github.com/betacygni/ALMAGAL#pipeline-imaging-and-continuum-determination)
-  - [**Data combination**](https://github.com/betacygni/ALMAGAL#data-combination)
-  - [**Transfer of products to your local workstation**](https://github.com/betacygni/ALMAGAL#transfer-of-products-to-your-local-workstation)
-  - [**Directory structure**](https://github.com/betacygni/ALMAGAL#directory-structure)
-  - [**Order of execution of the scripts**](https://github.com/betacygni/ALMAGAL#order-of-execution-of-the-scripts)
-  - [**Download and usage**](https://github.com/betacygni/ALMAGAL#download-and-usage)
+
 
 ------------------------------------
 Download / Installation instructions

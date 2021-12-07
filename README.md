@@ -393,7 +393,9 @@ The following is a list with more than 30 publications using STATCONT in their a
 
 - *Survey Observation of CH 3 NH 2  and Its Formation Process*<br /> by Suzuki et al. 2019, submitted to ApJ ([link](https://ui.adsabs.harvard.edu/abs/2019arXiv190900528S/abstract))
 
-- *The CARMA-NRO Orion Survey. Filamentary structure as seen in C18O emission*<br /> by Suri et al. 2019, A&A, 623, A142 ([link](https://ui.adsabs.harvard.edu/abs/2019A%26A...623A.142S/abstract))
+- *Molecular analysis of a high-mass prestellar core candidate in W43-MM1*<br /> by Suri et al. 2019, A&A, 623, A142 ([link](https://ui.adsabs.harvard.edu/abs/2019A%26A...626A.132M/abstract))
+
+- *The CARMA-NRO Orion Survey. Filamentary structure as seen in C18O emission*<br /> by Molet et al. 2019, A&A, 626, A132 ([link](https://ui.adsabs.harvard.edu/abs/2019A%26A...623A.142S/abstract))
 
 - *A 10-M⊙ YSO with a Keplerian disk and a nonthermal radio jet*<br /> by Moscadelli et al. 2019, A&A, 622, A206 ([link](https://ui.adsabs.harvard.edu/abs/2019A%26A...622A.206M/abstract))
 

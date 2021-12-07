@@ -337,13 +337,9 @@ Examples of real data
 
 If you have multiple ASCII or FITS files at different frequencies, you can use 
 
-| ![G29](figures/plot_G29.png) | 
-|:--:| 
-| *Space* |
-
-| ![SgrB2](figures/plot_SgrB2.png) | 
-|:--:| 
-| *Space* |
+| ![G29](figures/plot_G29.png) | ![SgrB2](figures/plot_SgrB2.png) | 
+|:--:|:--:| 
+| *Space* || *Space* |
 
 
 -----------------------------------

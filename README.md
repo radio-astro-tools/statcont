@@ -351,6 +351,8 @@ The following is a list with more than 30 publications using STATCONT in their a
 
 - *Detection of hydroxyacetone in protostar IRAS 16293-2422 B*<br /> by Zhou et al. 2020, RAA, 20, 125 ([link](https://ui.adsabs.harvard.edu/abs/2020RAA....20..125Z/abstract))
 
+- *Constraints of the Formation and Abundances of Methyl Carbamate, a Glycine Isomer, in Hot Corinos*<br /> by Sahu et al. 2020, ApJ, 899, 65 ([link](https://ui.adsabs.harvard.edu/abs/2020ApJ...899...65S/abstract))
+
 - *Astrochemistry During the Formation of Stars*<br /> by Jorgensen et al. 2020, ARA&A, 58, 727 ([link](https://ui.adsabs.harvard.edu/abs/2020ARA%26A..58..727J/abstract))
 
 - *Exploring the formation pathways of formamide. Near young O-type stars*<br /> by Allen et al. 2020, A&A, 636, A67 ([link](https://ui.adsabs.harvard.edu/abs/2020A%26A...636A..67A/abstract))

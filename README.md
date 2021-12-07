@@ -166,9 +166,10 @@ find a directory called data that contains three other subdirectories
 STATCONT requires of a directory data where the files to be processed 
 are stored. By executing STATCONT, another directory called products 
 will be generated. The files to be processed, can be directly saved in 
-data or in subdirectories. In the examples provided here, we have a set 
-of single-spectrum files (in ASCII format) saved in `SPEC_TESTS` and
-`SPINDEX`, and FITS cubes in `MAP_TESTS`.
+the data directory or in subdirectories within data. In the examples
+provided here, we have a set of single-spectrum files (in ASCII format)
+saved in the subdirectories `SPEC_TESTS` and `SPINDEX`, and a FITS cube
+in the subdirectory `MAP_TESTS`.
 
 
 Determining the continuum in single spectrum files (ASCII files)

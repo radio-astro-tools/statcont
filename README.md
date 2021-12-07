@@ -339,12 +339,7 @@ If you have multiple ASCII or FITS files at different frequencies, you can use
 
 | ![SgrB2](figures/plot_SgrB2.png) | ![G29](figures/plot_G29.png) | 
 |:--:|:--:| 
-| *Example case Sgr B2(N). (top-left) Continuum emission map as determined with the c-SCM method of STATCONT. The synthesized beam
-is 000.4. (top-right) Continuum emission map determined after searching and selecting line-free channels. (middle-left) Noise map obtained with
-c-SCM. (middle-right) Ratio of the c-SCM to classical-approach continuum maps. (bottom panels) Continuum-subtracted spectra using the c-SCM
-value towards two selected positions A and B, shown in the top-left panel. The channels used for the continuum determination after clipping and
-converging are depicted in red. The c-SCM continuum emission level subtracted to the original spectra, together with its uncertainty, are listed in
-the upper part of each panel. See more details of these data in Sanchez-Monge et al (2017).* | *Space* |
+| *Example case Sgr B2(N). (top-left) Continuum emission map as determined with the c-SCM method of STATCONT. The synthesized beam is 000.4. (top-right) Continuum emission map determined after searching and selecting line-free channels. (middle-left) Noise map obtained with c-SCM. (middle-right) Ratio of the c-SCM to classical-approach continuum maps. (bottom panels) Continuum-subtracted spectra using the c-SCM value towards two selected positions A and B, shown in the top-left panel. The channels used for the continuum determination after clipping and converging are depicted in red. The c-SCM continuum emission level subtracted to the original spectra, together with its uncertainty, are listed in the upper part of each panel. See more details of these data in Sanchez-Monge et al (2017).* | *Space* |
 
 
 -----------------------------------

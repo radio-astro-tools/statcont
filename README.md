@@ -46,7 +46,7 @@ as well as in this [webpage](http://www.astro.uni-koeln.de/~sanchez/statcont). T
 required software to use STATCONT is Python and Astropy, together with some basic
 Python packages that you can find listed [here](https://github.com/radio-astro-tools/statcont#required-python-packages).
 
-**Installation version 1**<br \>
+**Installation method 1**<br />
 You can directly install STATCONT by typing in a terminal session in 
 your computer (you may need sudo permissions depending on the 
 configuration of your system):
@@ -55,6 +55,7 @@ configuration of your system):
 pip install https://github.com/radio-astro-tools/statcont/archive/master.zip
 ```
 
+**Installation method 2**<br />
 You can also clone STATCONT in your computer from the GitHub repository. For
 this, create a directory and move there. Then type:
 
@@ -65,6 +66,7 @@ cd statcont
 python setup.py install
 ```
 
+**Installation method 3**<br />
 Alternatively, STATCONT can also be downloaded locally as a zip file 
 from: [master.zip](https://github.com/radio-astro-tools/statcont/archive/master.zip).
 In order to install it, download the file to a directory in your computer:

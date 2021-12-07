@@ -287,7 +287,7 @@ Publications making use of STATCONT
 
 This is a list of publications using STATCONT:
 
- - *Radio outburst from a massive (proto)star. When accretion turns into ejection*\  by: Cesaroni et al. 2018, A&A, 612, A103 ([link](https://ui.adsabs.harvard.edu/abs/2018A%26A...612A.103C/abstract))
+ - *Radio outburst from a massive (proto)star. When accretion turns into ejection*<br />  by: Cesaroni et al. 2018, A&A, 612, A103 ([link](https://ui.adsabs.harvard.edu/abs/2018A%26A...612A.103C/abstract))
 
  - *Distributed Star Formation throughout the Galactic Center Cloud Sgr B2*  by: Ginsburg et al. 2018, ApJ, 853, 171 ([link](https://ui.adsabs.harvard.edu/abs/2018ApJ...853..171G/abstract))
 

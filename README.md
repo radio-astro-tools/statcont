@@ -98,7 +98,7 @@ statcont --help
 ```
 
 At the beginning of the help message you will see the version of STATCONT.
-The current stable version is 1.5.
+The current stable release is `version 1.5`.
 
 ---------------------
 Required Python packages

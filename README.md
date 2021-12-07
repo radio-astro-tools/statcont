@@ -57,8 +57,7 @@ pip install https://github.com/radio-astro-tools/statcont/archive/master.zip
 
 - **Installation method 2**<br />
 You can also clone STATCONT in your computer from the GitHub repository. For
-this, create a directory and move there. Then type:
-
+this, create a directory and move there. Then type:<br />
 ```
 git init
 git clone https://github.com/radio-astro-tools/statcont

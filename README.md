@@ -86,7 +86,7 @@ statcont --help
 Required Python packages
 ---------------------
 
-STATCONT uses the following Python packates:
+STATCONT uses the following Python packages:
 
 - [argparse](https://docs.python.org/3/library/argparse.html) : version >= 1.1
 - [astropy](https://www.astropy.org/) : version >= 4.2.1

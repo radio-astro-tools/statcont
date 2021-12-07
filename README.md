@@ -33,6 +33,7 @@ This README document is intented to help you install and use STATCONT. In the fo
   - [**Examples and test cases**](https://github.com/radio-astro-tools/statcont#examples-and-test-cases)
     - [**Determining the continuum in single spectrum files (ASCII files)**](https://github.com/radio-astro-tools/statcont/blob/master/README.md#determining-the-continuum-in-single-spectrum-files-ascii-files)
     - [**Determining the continuum in a 3D cube file (FITS files)**](https://github.com/radio-astro-tools/statcont/blob/master/README.md#determining-the-continuum-in-a-3d-cube-file-fits-files)
+    - [**Determining the spectral index from multiple input files**](https://github.com/radio-astro-tools/statcont/blob/master/README.md#determining-the-spectral-index-from-multiple-input-files)
   - [**Publications citing STATCONT**](https://github.com/radio-astro-tools/statcont#publications-citing-statcont)
 
 ------------------------------------

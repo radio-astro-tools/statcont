@@ -40,10 +40,13 @@ Installation instructions
 ------------------------------------
 
 STATCONT uses the [ASTROPY](https://www.astropy.org/) package-template and is
-fully compatible with the ASTROPY ecosystem. It is freely available for at
+fully compatible with the ASTROPY ecosystem. It is freely available for download at
 the [GitHub](https://github.com/) repository [Radio Astro Tools](http://radio-astro-tools.github.io/),
-and in this webpage. The only required software to use STATCONT is Python and Astropy.
+as well as in this [webpage](http://www.astro.uni-koeln.de/~sanchez/statcont). The only
+required software to use STATCONT is Python and Astropy, together with some basic
+Python packages that you can find listed [here](https://github.com/radio-astro-tools/statcont#required-python-packages).
 
+**Installation version 1**<br \>
 You can directly install STATCONT by typing in a terminal session in 
 your computer (you may need sudo permissions depending on the 
 configuration of your system):

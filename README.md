@@ -122,12 +122,17 @@ worked fine in previous tests and are expected to continue working.
 Main STATCONT commands and options
 ---------------------
 
-STATCONT main commands and options:
+The following table contains the main commands and options of STATCONT. They can be explored and executed by typing
+
+```
+statcont --help
+```
+
 
 | Command | Description |
 | --- | --- |
-| `--help` | Description |
-| `-i` / `--iname` | Description |
+| `--help` | Show the help message and all the STATCONT commands |
+| `-i` / `--iname` | NECESSARY (unless `-f`, `-s` or `-l` are used): FITS file to be processed (without extension, which should be .fits) |
 | `-f` / `--ifile` | Description |
 | `-s` / `--ispec` | Description |
 | `-l` / `--ilist` | Description |

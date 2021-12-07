@@ -287,6 +287,28 @@ Publications citing STATCONT
 
 This is a list of publications using STATCONT:
 
+- *Is There Any Linkage between Interstellar Aldehyde and Alcohol?*<br /> by Mondal et al. 2021, ApJ, 922, 194 ([link](https://ui.adsabs.harvard.edu/abs/2021ApJ...922..194M/abstract))
+
+- *A cold accretion flow onto one component of a multiple protostellar system*<br /> by Murillo et al. 2021, accepted for publication in A&A ([link](https://ui.adsabs.harvard.edu/abs/2021arXiv211104039M/abstract))
+
+- *Starburst Energy Feedback Seen Through HCO + /HOC +  Emission in NGC 253 from ALCHEMI*<br /> by Harada et al. 2021, accepted for publication in ApJ ([link](https://ui.adsabs.harvard.edu/abs/2021arXiv210906476H/abstract))
+
+- *The GUAPOS project. II. A comprehensive study of peptide-like bond molecules*<br /> by Colzi et al. 2021, A&A, 653, A129 ([link](https://ui.adsabs.harvard.edu/abs/2021A%26A...653A.129C/abstract))
+
+- *ALCHEMI: an ALMA Comprehensive High-resolution Extragalactic Molecular Inventory. Survey presentation and first results from the ACA array*<br /> by Martin et al. 2021, accepted for publication in A&A ([link](https://ui.adsabs.harvard.edu/abs/2021arXiv210908638M/abstract))
+
+- *ALMA observations of doubly deuterated water: inheritance of water from the prestellar environment*<br /> by Jensen et al. 2021, A&A, 650, A172 ([link](https://ui.adsabs.harvard.edu/abs/2021A%26A...650A.172J/abstract))
+
+- *The ionized heart of a molecular disk. ALMA observations of the hyper-compact HII region G24.78+0.08 A1*<br /> by Moscadelli et al. 2021, A&A, 650, A142 ([link](https://ui.adsabs.harvard.edu/abs/2021A%26A...650A.142M/abstract))
+
+- *Star formation in 'the Brick': ALMA reveals an active protocluster in the Galactic centre cloud G0.253+0.016*<br /> by Walker et al. 2021, MNRAS, 503, 77 ([link](https://ui.adsabs.harvard.edu/abs/2021MNRAS.503...77W/abstract))
+
+- *Fragmentation in the massive G31.41+0.31 protocluster*<br /> by Beltran et al. 2021, A&A, 648, A100 ([link](https://ui.adsabs.harvard.edu/abs/2021A%26A...648A.100B/abstract))
+
+- *Digging into the Interior of Hot Cores with ALMA (DIHCA). I. Dissecting the High-mass Star-forming Core G335.579-0.292 MM1*<br /> by Olguin et al. 2021, ApJ, 909, 199 ([link](https://ui.adsabs.harvard.edu/abs/2021ApJ...909..199O/abstract))
+
+- *The prebiotic molecular inventory of Serpens SMM1. I. An investigation of the isomers CH3NCO and HOCH2CN*<br /> by Ligterink et al. 2021, A&A, 647, A87 ([link](https://ui.adsabs.harvard.edu/abs/2021A%26A...647A..87L/abstract))
+
 - *Subarcsecond Imaging of the Complex Organic Chemistry in Massive Star-forming Region G10.6-0.4*<br /> by Law et al. 2021, ApJ, 909, 214 ([link](https://ui.adsabs.harvard.edu/abs/2021ApJ...909..214L/abstract))
 
 - *The GUAPOS project: G31.41+0.31 Unbiased ALMA sPectral Observational Survey. I. Isomers of C2H4O2*<br /> by Mininni et al. 2020, A&A, 644, A84 ([link](https://ui.adsabs.harvard.edu/abs/2020A%26A...644A..84M/abstract))
@@ -297,7 +319,7 @@ This is a list of publications using STATCONT:
 
 - *Detection of hydroxyacetone in protostar IRAS 16293-2422 B*<br /> by Zhou et al. 2020, RAA, 20, 125 ([link](https://ui.adsabs.harvard.edu/abs/2020RAA....20..125Z/abstract))
 
-- *Astrochemistry During the Formation of Stars*<br /> by Allen et al. 2020, ARA&A, 58, 727 ([link](https://ui.adsabs.harvard.edu/abs/2020ARA%26A..58..727J/abstract))
+- *Astrochemistry During the Formation of Stars*<br /> by Jorgensen et al. 2020, ARA&A, 58, 727 ([link](https://ui.adsabs.harvard.edu/abs/2020ARA%26A..58..727J/abstract))
 
 - *Exploring the formation pathways of formamide. Near young O-type stars*<br /> by Allen et al. 2020, A&A, 636, A67 ([link](https://ui.adsabs.harvard.edu/abs/2020A%26A...636A..67A/abstract))
 

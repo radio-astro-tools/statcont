@@ -32,7 +32,7 @@ This README document is intented to help you install and use STATCONT using some
   - [**Examples and test cases**](https://github.com/radio-astro-tools/statcont#examples-and-test-cases)
     - [**Determining the continuum in single spectrum files (ASCII files)**](https://github.com/radio-astro-tools/statcont/blob/master/README.md#determining-the-continuum-in-single-spectrum-files-ascii-files)
     - [**Determining the continuum in a 3D cube file (FITS files)**](https://github.com/radio-astro-tools/statcont/blob/master/README.md#determining-the-continuum-in-a-3d-cube-file-fits-files)
-  - [**Publications making use of STATCONT**](https://github.com/radio-astro-tools/statcont#publications-making-use-of-statcont)
+  - [**Publications citing STATCONT**](https://github.com/radio-astro-tools/statcont#publications-citing-statcont)
 
 ------------------------------------
 Installation instructions
@@ -282,15 +282,29 @@ continuum emission with frequency.
 
 
 -----------------------------------
-Publications making use of STATCONT
+Publications citing STATCONT
 -----------------------------------
 
-This is a list of publications using STATCONT:
+This is a list of publications citing STATCONT:
 
- - *Radio outburst from a massive (proto)star. When accretion turns into ejection*<br /> by Cesaroni et al. 2018, A&A, 612, A103 ([link](https://ui.adsabs.harvard.edu/abs/2018A%26A...612A.103C/abstract))
+- *A 10-M⊙ YSO with a Keplerian disk and a nonthermal radio jet*<br /> by Moscadelli et al. 2019, A&A, 622, A206 ([link](https://ui.adsabs.harvard.edu/abs/2019A%26A...622A.206M/abstract))
 
- - *Distributed Star Formation throughout the Galactic Center Cloud Sgr B2*<br /> by Ginsburg et al. 2018, ApJ, 853, 171 ([link](https://ui.adsabs.harvard.edu/abs/2018ApJ...853..171G/abstract))
+- *Evidence for the First Extragalactic Hydrogen Recombination Line Maser in NGC 253*<br /> by Baez-Rubio et al. 2018, ApJL, 867, L6 ([link](https://ui.adsabs.harvard.edu/abs/2018ApJ...867L...6B/abstract))
 
- - *The physical and chemical structure of Sagittarius B2 - II. Continuum millimeter emission of SgrB2(M) and SgrB2(N) with ALMA*<br /> by Sanchez-Monge et al. 2017, A&A, 604, A6 ([link](https://ui.adsabs.harvard.edu/abs/2017A%26A...604A...6S/abstract))
+- *Chasing discs around O-type (proto)stars. ALMA evidence for an SiO disc and disc wind from G17.64+0.16*<br /> by Maud et al. 2018, A&A, 620, A31 ([link](https://ui.adsabs.harvard.edu/abs/2018A%26A...620A..31M/abstract))
 
- - *Chasing disks around O-type (proto)stars: Evidence from ALMA observations*<br />  by Cesaroni et al. 2017, A&A, 602, A59 ([link](https://ui.adsabs.harvard.edu/abs/2017A%26A...602A..59C/abstract))
+- *The Extraordinary Outburst in the Massive Protostellar System NGC 6334I-MM1: Flaring of the Water Masers in a North-South Bipolar Outflow Driven by MM1B*<br /> by Brogan et al. 2018, ApJ, 866, 87 ([link](https://ui.adsabs.harvard.edu/abs/2018ApJ...866...87B/abstract))
+
+- *The feedback of an HC HII region on its parental molecular core. The case of core A1 in the star-forming region G24.78+0.08*<br /> by Moscadelli et al. 2018, A&A, 616, A66 ([link](https://ui.adsabs.harvard.edu/abs/2018A%26A...616A..66M/abstract))
+
+- *Accelerating infall and rotational spin-up in the hot molecular core G31.41+0.31*<br /> by Beltran et al. 2018, A&A, 615, A141 ([link](https://ui.adsabs.harvard.edu/abs/2018A%26A...615A.141B/abstract))
+
+- *The physical and chemical structure of Sagittarius B2 - III. Radiative transfer simulations of the hot core Sgr B2(M) for methyl cyanide*<br /> by Pols et al. 2018, A&A, 614, A123 ([link](https://ui.adsabs.harvard.edu/abs/2018A%26A...614A.123P/abstract))
+
+- *Radio outburst from a massive (proto)star. When accretion turns into ejection*<br /> by Cesaroni et al. 2018, A&A, 612, A103 ([link](https://ui.adsabs.harvard.edu/abs/2018A%26A...612A.103C/abstract))
+
+- *Distributed Star Formation throughout the Galactic Center Cloud Sgr B2*<br /> by Ginsburg et al. 2018, ApJ, 853, 171 ([link](https://ui.adsabs.harvard.edu/abs/2018ApJ...853..171G/abstract))
+
+- *The physical and chemical structure of Sagittarius B2 - II. Continuum millimeter emission of SgrB2(M) and SgrB2(N) with ALMA*<br /> by Sanchez-Monge et al. 2017, A&A, 604, A6 ([link](https://ui.adsabs.harvard.edu/abs/2017A%26A...604A...6S/abstract))
+
+- *Chasing disks around O-type (proto)stars: Evidence from ALMA observations*<br />  by Cesaroni et al. 2017, A&A, 602, A59 ([link](https://ui.adsabs.harvard.edu/abs/2017A%26A...602A..59C/abstract))

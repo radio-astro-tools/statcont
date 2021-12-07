@@ -266,7 +266,7 @@ You can use all the continuum methods and plot them all together, like:
 
 Have a look now at the plot products/SPEC_TESTS/plots/my_emission_1_1.png (see image below)
 
-![STATCONT all methods](test-cases/my_emission_1_1.png)
+![STATCONT all methods](figures/my_emission_1_1.png)
  
 
 Determining the continuum in a 3D cube file (FITS files)
@@ -337,11 +337,11 @@ Examples of real data
 
 If you have multiple ASCII or FITS files at different frequencies, you can use 
 
-| ![SgrB2](test-cases/my_emission_1_1.png) | 
+| ![SgrB2](figures/plot_G29.eps) | 
 |:--:| 
 | *Space* |
 
-| ![G29](test-cases/my_emission_1_1.png) | 
+| ![G29](figures/plot_SgrB2.eps) | 
 |:--:| 
 | *Space* |
 

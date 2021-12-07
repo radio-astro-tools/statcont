@@ -129,8 +129,8 @@ statcont --help
 ```
 
 
-| Command | | Description |
-| --- | --- |
+| Command | Necessary? | Description |
+| --- | --- | --- |
 | `--help` | Show the help message and all the STATCONT commands |
 | `-i` / `--iname` | NECESSARY<br /> (unless `-f`, `-s` or `-l` are used) | Name of the FITS file to be processed (without extension, which should be .fits)<br /> Example: `-i SYNTHETIC_cube`<br /> The file SYNTHETIC_cube.fits has to be stored in the `data` directory |
 | `-f` / `--ifile` | NECESSARY<br /> (unless `-i`, `-s` or `-l` are used) | Text file containing a list of FITS files to be processed (files to be processed have to be listed without extension, which should be .fits)<br /> Example: `-f file.txt`<br /> The file file.txt has to be stored in the running directory |
@@ -138,10 +138,10 @@ statcont --help
 | `-l` / `--ilist` | NECESSARY<br /> (unless `-i`, `-f` or `-s` are used) | Text file containing a list of ASCII files to be processed (files to be processed have to be listed without extension, which should be .dat)<br /> Example: `-l file.txt`<br /> The file file.txt has to be stored in the running directory |
 | `-p` / `--ipath` | OPTIONAL | Specify the path/directory there the files to be processed are stored.<br /> This path/directory has to inside the `data` directory |
 | `-n` / `--noise` | NECESSARY | Typical RMS noise level of the observations<br /> A value of 1 can be used in most of the cases |
-| `--continuum` | OPTIONAL | |
-| `--plots` | OPTIONAL | |
-| `--cutout` | OPTIONAL | |
-| `--spindex` | OPTIONAL | |
+| `--continuum` | OPTIONAL | Description |
+| `--plots` | OPTIONAL | Description |
+| `--cutout` | OPTIONAL | Description |
+| `--spindex` | OPTIONAL | Description |
 
 
 ---------------------

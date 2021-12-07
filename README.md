@@ -27,11 +27,14 @@ Access to the article in [PDF](https://hera.ph1.uni-koeln.de/~sanchez/my_documen
 More information about STATCONT can be found in the webpage [http://www.astro.uni-koeln.de/~sanchez/statcont](http://www.astro.uni-koeln.de/~sanchez/statcont)
 
 This README document is intented to help you install and use STATCONT using some test-cases provided below. In the following you will find:
-  - [**Download / Installation instructions**](https://github.com/radio-astro-tools/statcont#download-/-installation-instructions)
+  - [**Installation instructions**](https://github.com/radio-astro-tools/statcont#installation-instructions)
+  - [**Required Python packages**](https://github.com/radio-astro-tools/statcont#required-python-packages)
+  - [**Examples and test cases**](https://github.com/radio-astro-tools/statcont#examples-and-test-cases)
+  - [**TEST**](Determining the continuum in single spectrum files (ASCII files))
 
 
 ------------------------------------
-Download / Installation instructions
+Installation instructions
 ------------------------------------
 
 STATCONT uses the [ASTROPY](https://www.astropy.org/) package-template and is
@@ -104,7 +107,7 @@ The versions indicated above have been recently tested, older versions
 worked fine in previous tests and are expected to continue working.
 
 ---------------------
-Examples / Test cases
+Examples and test cases
 ---------------------
 
 In the following we explain how to execute the main tasks of STATCONT. 

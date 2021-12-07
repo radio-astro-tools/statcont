@@ -285,7 +285,7 @@ continuum emission with frequency.
 Publications citing STATCONT
 -----------------------------------
 
-This is a list of publications using STATCONT:
+The following is a list with more than 30 publications using STATCONT in their analysis. The publications cover topics of low and high-mass star formation, extragalactic sources and astrochemical studies.
 
 - *Is There Any Linkage between Interstellar Aldehyde and Alcohol?*<br /> by Mondal et al. 2021, ApJ, 922, 194 ([link](https://ui.adsabs.harvard.edu/abs/2021ApJ...922..194M/abstract))
 

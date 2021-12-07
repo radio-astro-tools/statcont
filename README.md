@@ -285,9 +285,17 @@ continuum emission with frequency.
 Publications citing STATCONT
 -----------------------------------
 
-This is a list of publications citing STATCONT:
+This is a list of publications using STATCONT:
 
-- *Constraints of the Formation and Abundances of Methyl Carbamate, a Glycine Isomer, in Hot Corinos*<br /> by Sahu et al. 2020, ApJ, 899, 65 ([link](https://ui.adsabs.harvard.edu/abs/2020ApJ...899...65S/abstract))
+- *Subarcsecond Imaging of the Complex Organic Chemistry in Massive Star-forming Region G10.6-0.4*<br /> by Law et al. 2021, ApJ, 909, 214 ([link](https://ui.adsabs.harvard.edu/abs/2021ApJ...909..214L/abstract))
+
+- *The GUAPOS project: G31.41+0.31 Unbiased ALMA sPectral Observational Survey. I. Isomers of C2H4O2*<br /> by Mininni et al. 2020, A&A, 644, A84 ([link](https://ui.adsabs.harvard.edu/abs/2020A%26A...644A..84M/abstract))
+
+- *Multidirectional Mass Accretion and Collimated Outflows on Scales of 100-2000 au in Early Stages of High-mass Protostars*<br /> by Goddi et al. 2020, ApJ, 905, 25 ([link](https://ui.adsabs.harvard.edu/abs/2020ApJ...905...25G/abstract))
+
+- *Evidence for Dense Gas Heated by the Explosion in Orion KL*<br /> by Li et al. 2020, ApJ, 901, 62 ([link](https://ui.adsabs.harvard.edu/abs/2020ApJ...901...62L/abstract))
+
+- *Detection of hydroxyacetone in protostar IRAS 16293-2422 B*<br /> by Zhou et al. 2020, RAA, 20, 125 ([link](https://ui.adsabs.harvard.edu/abs/2020RAA....20..125Z/abstract))
 
 - *Astrochemistry During the Formation of Stars*<br /> by Allen et al. 2020, ARA&A, 58, 727 ([link](https://ui.adsabs.harvard.edu/abs/2020ARA%26A..58..727J/abstract))
 

@@ -26,7 +26,7 @@ Access to the article in [PDF](https://hera.ph1.uni-koeln.de/~sanchez/my_documen
 
 More information about STATCONT can be found in the webpage [http://www.astro.uni-koeln.de/~sanchez/statcont](http://www.astro.uni-koeln.de/~sanchez/statcont)
 
-This README document is intented to help you install and use STATCONT using some test-cases provided below. In the following you will find:
+This README document is intented to help you install and use STATCONT. In the following you will find:
   - [**Installation instructions**](https://github.com/radio-astro-tools/statcont#installation-instructions)
   - [**Required Python packages**](https://github.com/radio-astro-tools/statcont#required-python-packages)
   - [**Main STATCONT commands and options**](https://github.com/radio-astro-tools/statcont#main-statcont-commands-and-options)

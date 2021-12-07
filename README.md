@@ -29,6 +29,7 @@ More information about STATCONT can be found in the webpage [http://www.astro.un
 This README document is intented to help you install and use STATCONT using some test-cases provided below. In the following you will find:
   - [**Installation instructions**](https://github.com/radio-astro-tools/statcont#installation-instructions)
   - [**Required Python packages**](https://github.com/radio-astro-tools/statcont#required-python-packages)
+  - [**Main STATCONT commands and options**](https://github.com/radio-astro-tools/statcont#main-statcont-commands-and-options)
   - [**Examples and test cases**](https://github.com/radio-astro-tools/statcont#examples-and-test-cases)
     - [**Determining the continuum in single spectrum files (ASCII files)**](https://github.com/radio-astro-tools/statcont/blob/master/README.md#determining-the-continuum-in-single-spectrum-files-ascii-files)
     - [**Determining the continuum in a 3D cube file (FITS files)**](https://github.com/radio-astro-tools/statcont/blob/master/README.md#determining-the-continuum-in-a-3d-cube-file-fits-files)
@@ -91,6 +92,24 @@ statcont --help
 
 ---------------------
 Required Python packages
+---------------------
+
+STATCONT uses the following Python packages:
+
+- [argparse](https://docs.python.org/3/library/argparse.html) : version >= 1.1
+- [astropy](https://www.astropy.org/) : version >= 4.2.1
+- [datetime](https://docs.python.org/3/library/datetime.html)
+- [math](https://docs.python.org/3/library/math.html)
+- [matplotlib](https://matplotlib.org/) : version >= 3.5.0
+- [numpy](https://numpy.org/) : version >= 1.21.4
+- [os](https://docs.python.org/3/library/os.html)
+- [scipy](https://scipy.org/) : version >= 1.7.3
+
+The versions indicated above have been recently tested, older versions
+worked fine in previous tests and are expected to continue working.
+
+---------------------
+Main STATCONT commands and options
 ---------------------
 
 STATCONT uses the following Python packages:

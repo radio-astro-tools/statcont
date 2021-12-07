@@ -46,17 +46,19 @@ as well as in this [webpage](http://www.astro.uni-koeln.de/~sanchez/statcont). T
 required software to use STATCONT is Python and Astropy, together with some basic
 Python packages that you can find listed [here](https://github.com/radio-astro-tools/statcont#required-python-packages).
 
-- **Installation method 1**<br />
+**Installation method 1**<br />
 You can directly install STATCONT by typing in a terminal session in 
 your computer (you may need sudo permissions depending on the 
-configuration of your system):<br />
+configuration of your system):
+
 ```
 pip install https://github.com/radio-astro-tools/statcont/archive/master.zip
 ```
 
-- **Installation method 2**<br />
+**Installation method 2**<br />
 You can also clone STATCONT in your computer from the GitHub repository. For
-this, create a directory and move there. Then type:<br />
+this, create a directory and move there. Then type:
+
 ```
 git init
 git clone https://github.com/radio-astro-tools/statcont
@@ -64,7 +66,7 @@ cd statcont
 python setup.py install
 ```
 
-- **Installation method 3**<br />
+**Installation method 3**<br />
 Alternatively, STATCONT can also be downloaded locally as a zip file 
 from: [master.zip](https://github.com/radio-astro-tools/statcont/archive/master.zip).
 In order to install it, download the file to a directory in your computer:
@@ -75,9 +77,10 @@ cd statcont
 python setup.py install
 ```
 
+**How to solve permission errors**<br />
 If you get a permission error, this means that you do not have the required
 administrative access to install STATCONT to your Python installation. In
-this case you can use the option --user when installing the setup.py script.
+this case you can use the option `--user` when installing the setup.py script.
 You can follow these instructions:
 
 ```
@@ -85,6 +88,7 @@ python setup.py install --user --install-scripts="~/bin/"
 export PATH=~/bin/:$PATH
 ```
 
+**Check your installation**<br />
 Following the installation, you have immediate access to STATCONT in 
 your computer by typing "statcont" in a terminal session. For example, 
 inspect the help by doing:
@@ -92,6 +96,9 @@ inspect the help by doing:
 ```
 statcont --help
 ```
+
+At the beginning of the help message you will see the version of STATCONT.
+The current stable version is 1.5.
 
 ---------------------
 Required Python packages

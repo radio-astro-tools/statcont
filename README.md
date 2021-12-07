@@ -332,9 +332,9 @@ The spectral index (ALPHA) is defined as flux = FACTOR * frequency^(ALPHA)
 
 The first command determines the continuum level for all the files contained in the list.txt file, while the second command determines the spectral index.
 
-
+-----------------------------------
 Real data examples
---------------------------------------------------------
+-----------------------------------
 
 If you have multiple ASCII or FITS files at different frequencies, you can use 
 

@@ -30,7 +30,7 @@ This README document is intented to help you install and use STATCONT using some
   - [**Installation instructions**](https://github.com/radio-astro-tools/statcont#installation-instructions)
   - [**Required Python packages**](https://github.com/radio-astro-tools/statcont#required-python-packages)
   - [**Examples and test cases**](https://github.com/radio-astro-tools/statcont#examples-and-test-cases)
-  - [**TEST**](Determining the continuum in single spectrum files (ASCII files))
+  - [**Determining the continuum in single spectrum files (ASCII files)**](https://github.com/radio-astro-tools/statcont/blob/master/README.md#determining-the-continuum-in-single-spectrum-files-ascii-files)
 
 
 ------------------------------------

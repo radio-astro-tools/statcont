@@ -34,6 +34,7 @@ This README document is intented to help you install and use STATCONT. In the fo
     - [**Determining the continuum in single spectrum files (ASCII files)**](https://github.com/radio-astro-tools/statcont/blob/master/README.md#determining-the-continuum-in-single-spectrum-files-ascii-files)
     - [**Determining the continuum in a 3D cube file (FITS files)**](https://github.com/radio-astro-tools/statcont/blob/master/README.md#determining-the-continuum-in-a-3d-cube-file-fits-files)
     - [**Determining the spectral index from multiple input files**](https://github.com/radio-astro-tools/statcont/blob/master/README.md#determining-the-spectral-index-from-multiple-input-files)
+  - [**Real data examples**](https://github.com/radio-astro-tools/statcont#real-data-examples)
   - [**Publications citing STATCONT**](https://github.com/radio-astro-tools/statcont#publications-citing-statcont)
 
 ------------------------------------
@@ -332,7 +333,7 @@ The spectral index (ALPHA) is defined as flux = FACTOR * frequency^(ALPHA)
 The first command determines the continuum level for all the files contained in the list.txt file, while the second command determines the spectral index.
 
 
-Examples of real data
+Real data examples
 --------------------------------------------------------
 
 If you have multiple ASCII or FITS files at different frequencies, you can use 

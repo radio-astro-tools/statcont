@@ -132,7 +132,7 @@ statcont --help
 | Command | Description |
 | --- | --- |
 | `--help` | Show the help message and all the STATCONT commands |
-| `-i` / `--iname` | NECESSARY (unless `-f`, `-s` or `-l` are used): FITS file to be processed (without extension, which should be .fits) |
+| `-i` / `--iname` | NECESSARY (unless `-f`, `-s` or `-l` are used).<br /> Name of the FITS file to be processed (without extension, which should be .fits) |
 | `-f` / `--ifile` | Description |
 | `-s` / `--ispec` | Description |
 | `-l` / `--ilist` | Description |

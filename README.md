@@ -117,12 +117,12 @@ STATCONT main commands and options:
 | Command | Description |
 | --- | --- |
 | `--help` | Description |
-| `-i` | Description |
-| `-f` | Description |
-| `-s` | Description |
-| `-l` | Description |
-| `-p` | Description |
-| `-n` | Description |
+| `-i` / `--iname` | Description |
+| `-f` / `--ifile` | Description |
+| `-s` / `--ispec` | Description |
+| `-l` / `--ilist` | Description |
+| `-p` / `--ipath` | Description |
+| `-n` / `--noise` | Description |
 | `--continuum` | Description |
 | `--plots` | Description |
 | `--cutout` | Description |

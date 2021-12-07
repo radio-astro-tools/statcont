@@ -49,8 +49,7 @@ Python packages that you can find listed [here](https://github.com/radio-astro-t
 - **Installation method 1**<br />
 You can directly install STATCONT by typing in a terminal session in 
 your computer (you may need sudo permissions depending on the 
-configuration of your system):
-
+configuration of your system):<br />
 ```
 pip install https://github.com/radio-astro-tools/statcont/archive/master.zip
 ```

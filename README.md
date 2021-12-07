@@ -287,19 +287,14 @@ Publications making use of STATCONT
 
 This is a list of publications using STATCONT:
 
- - The physical and chemical structure of Sagittarius B2 - II. Continuum
-   millimeter emission of SgrB2(M) and SgrB2(N) with ALMA
-   by: Sánchez-Monge, Á., Schilke, P., Schmiedeke, A., Ginsburg, A.,
-       Cesaroni, R., Lis, D. C., Qin, S.-L. Müller, H. S. P., Bergin, E.,
-       Comito, C., and Möller, Th.
-   2017, Astronomy and Astrophysics, submitted
+ - Radio outburst from a massive (proto)star. When accretion turns into ejection
+   by: Cesaroni et al. 2018, Astronomy & Astrophysics, 612, A103 ([link](https://ui.adsabs.harvard.edu/abs/2018A%26A...612A.103C/abstract))
+
+ - Distributed Star Formation throughout the Galactic Center Cloud Sgr B2
+   by: Ginsburg et al. 2018, The Astrophysical Journal, 853, 171 ([link](https://ui.adsabs.harvard.edu/abs/2018ApJ...853..171G/abstract))
+
+ - The physical and chemical structure of Sagittarius B2 - II. Continuum millimeter emission of SgrB2(M) and SgrB2(N) with ALMA
+   by: Sanchez-Monge et al. 2017, Astronomy and Astrophysics, 604, A6 ([link](https://ui.adsabs.harvard.edu/abs/2017A%26A...604A...6S/abstract))
 
  - Chasing disks around O-type (proto)stars: Evidence from ALMA observations
-   by: Cesaroni, R., Sánchez-Monge, Á., Beltrán, M. T., Johnston, K. G.,
-       Maud, L. T., Moscadelli, L., Mottram, J. C., Ahmadi, A., Allen, V.,
-       Beuther, H.., Csengeri, T., Etoka, S., Fuller, G. A., Galli, D.,
-       Galván-Madrid, R., Goddi, C., Henning, T., Hoare, M. G.,
-       Klaassen, P. D., Kuiper, R., Kumar, M. S. N., Lumsden S., Peters, T.,
-       Rivilla, V. M., Schilke, P., Testi, L., van der Tak, F., Vig, S.,
-       Walmsley, C. M., and Zinnecker, H.
-   2016, Astronomy and Astrophysics, submitted
+   by: Cesaroni et al. 2017, Astronomy and Astrophysics, 602, A59 ([link](https://ui.adsabs.harvard.edu/abs/2017A%26A...602A..59C/abstract))

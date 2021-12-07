@@ -287,6 +287,18 @@ Publications citing STATCONT
 
 This is a list of publications citing STATCONT:
 
+- *Constraints of the Formation and Abundances of Methyl Carbamate, a Glycine Isomer, in Hot Corinos*<br /> by Sahu et al. 2020, ApJ, 899, 65 ([link](https://ui.adsabs.harvard.edu/abs/2020ApJ...899...65S/abstract))
+
+- *Astrochemistry During the Formation of Stars*<br /> by Allen et al. 2020, ARA&A, 58, 727 ([link](https://ui.adsabs.harvard.edu/abs/2020ARA%26A..58..727J/abstract))
+
+- *Exploring the formation pathways of formamide. Near young O-type stars*<br /> by Allen et al. 2020, A&A, 636, A67 ([link](https://ui.adsabs.harvard.edu/abs/2020A%26A...636A..67A/abstract))
+
+- *The HI/OH/Recombination line survey of the inner Milky Way (THOR): data release 2 and H I overview*<br /> by Wang et al. 2020, A&A, 634, A83 ([link](https://ui.adsabs.harvard.edu/abs/2020A%26A...634A..83W/abstract))
+
+- *Survey Observation of CH 3 NH 2  and Its Formation Process*<br /> by Suzuki et al. 2019, submitted to ApJ ([link](https://ui.adsabs.harvard.edu/abs/2019arXiv190900528S/abstract))
+
+- *The CARMA-NRO Orion Survey. Filamentary structure as seen in C18O emission*<br /> by Suri et al. 2019, A&A, 623, A142 ([link](https://ui.adsabs.harvard.edu/abs/2019A%26A...623A.142S/abstract))
+
 - *A 10-M⊙ YSO with a Keplerian disk and a nonthermal radio jet*<br /> by Moscadelli et al. 2019, A&A, 622, A206 ([link](https://ui.adsabs.harvard.edu/abs/2019A%26A...622A.206M/abstract))
 
 - *Evidence for the First Extragalactic Hydrogen Recombination Line Maser in NGC 253*<br /> by Baez-Rubio et al. 2018, ApJL, 867, L6 ([link](https://ui.adsabs.harvard.edu/abs/2018ApJ...867L...6B/abstract))

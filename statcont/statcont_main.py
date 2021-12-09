@@ -66,9 +66,6 @@ def process_files(iname=False,
         lines = [line.rstrip('\n') for line in open(ilist[0])]
         input_files = lines
         extension = '.dat'
-        print("HOLA")
-        print(input_files)
-        print("ADIOS")
 
     # Create directories and define working paths
     if betaversion:

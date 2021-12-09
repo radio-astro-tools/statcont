@@ -242,7 +242,7 @@ def c_sigmaclip1D(flux, rms_noise, betaversion, sigma_clip_threshold=2.0):
     """
 
     # Sigma-clipping method applied to the flux array
-    if astropy.version.major >= 4:
+    if astropy.version.major >= 3:
         filtered_data = sigma_clip(flux, sigma=sigma_clip_threshold,
                                    maxiters=None)
     elif astropy.version.major >= 1:
@@ -350,10 +350,10 @@ def c_sigmaclip(flux, rms_noise, freq_axis, sigma_clip_threshold=1.8):
     """
 
     # Sigma-clipping method applied to the flux array
-    if astropy.version.major >= 4:
+    if astropy.version.major >= 3:
         filtered_data = astropy.stats.sigma_clip(flux, sigma=sigma_clip_threshold,
                                                  maxiters=None, axis=freq_axis)
-    elif astropy.version.major < 4:
+    elif astropy.version.major < 3:
         filtered_data = astropy.stats.sigma_clip(flux, sigma=sigma_clip_threshold,
                                                  iters=None, axis=freq_axis)
 

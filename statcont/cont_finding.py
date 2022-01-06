@@ -242,7 +242,10 @@ def c_sigmaclip1D(flux, rms_noise, betaversion, sigma_clip_threshold=2.0):
     """
 
     # Sigma-clipping method applied to the flux array
-    if astropy.version.major >= 1:
+    if astropy.version.major >= 3:
+        filtered_data = sigma_clip(flux, sigma=sigma_clip_threshold,
+                                   maxiters=None)
+    elif astropy.version.major >= 1:
         filtered_data = sigma_clip(flux, sigma=sigma_clip_threshold,
                                    maxiters=None)
     elif astropy.version.major < 1:
@@ -347,8 +350,12 @@ def c_sigmaclip(flux, rms_noise, freq_axis, sigma_clip_threshold=1.8):
     """
 
     # Sigma-clipping method applied to the flux array
-    filtered_data = astropy.stats.sigma_clip(flux, sigma=sigma_clip_threshold,
-                                             iters=None, axis=freq_axis)
+    if astropy.version.major >= 3:
+        filtered_data = astropy.stats.sigma_clip(flux, sigma=sigma_clip_threshold,
+                                                 maxiters=None, axis=freq_axis)
+    elif astropy.version.major < 3:
+        filtered_data = astropy.stats.sigma_clip(flux, sigma=sigma_clip_threshold,
+                                                 iters=None, axis=freq_axis)
 
     sigmaclip_flux_prev = sigmaclip_flux = np.mean(filtered_data, axis=freq_axis)
     sigmaclip_noise = sigmaclip_sigma = np.std(filtered_data, axis=freq_axis)
@@ -373,15 +380,15 @@ def c_sigmaclip(flux, rms_noise, freq_axis, sigma_clip_threshold=1.8):
         view1 = [slice(None)]
 
     # Set up the fraction of channels (in %) that are in emission
-    fraction_emission = (100 * (flux[view1] >
+    fraction_emission = (100 * (flux[tuple(view1)] >
                                 (sigmaclip_flux+1*rms_noise)).sum(axis=0) /
-                         flux[view1].shape[0])
-
+                         flux[tuple(view1)].shape[0])
+    
     # Set up the fraction of channels (in %) that are in absorption
-    fraction_absorption = (100 * (flux[view1] <
+    fraction_absorption = (100 * (flux[tuple(view1)] <
                                   (sigmaclip_flux-1*rms_noise)).sum(axis=0) /
-                           flux[view1].shape[0])
-
+                           flux[tuple(view1)].shape[0])
+    
     # Apply correction to continuum level
     # see details in Sect. 2.4 of paper Sanchez-Monge et al. (2018)
     sigmaclip_flux_case1 = np.where((fraction_emission < 33) &

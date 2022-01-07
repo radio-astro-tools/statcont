@@ -577,9 +577,14 @@ def c_sigmaclip_scube(cube, rms_noise, freq_axis=0, sigma_clip_threshold=1.8,
         print(cube)
 
     # Sigma-clipping method applied to the flux array
-    filtered_cube = cube.sigma_clip_spectrally(threshold=sigma_clip_threshold,
-                                               save_to_tmp_dir=save_to_tmp_dir,
-                                               maxiters=None)
+    try:
+        filtered_cube = cube.sigma_clip_spectrally(threshold=sigma_clip_threshold,
+                                                   save_to_tmp_dir=save_to_tmp_dir,
+                                                   maxiters=None)
+    except TypeError:
+        # if the cube is not a dask_spectral_cube
+        filtered_cube = cube.sigma_clip_spectrally(threshold=sigma_clip_threshold,
+                                                   maxiters=None)
 
     sigmaclip_flux_prev = sigmaclip_flux = filtered_cube.mean(axis=freq_axis)
     sigmaclip_noise = sigmaclip_sigma = filtered_cube.std(axis=freq_axis)
